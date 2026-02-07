@@ -10,6 +10,7 @@
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
         
+        /* 唤醒按钮 */
         .trigger-btn {
             position: fixed; top: 15px; right: 20px; z-index: 1001;
             padding: 6px 15px; background: var(--core-hex); color: white;
@@ -17,32 +18,34 @@
             box-shadow: 0 0 15px rgba(39, 174, 96, 0.4); font-weight: bold;
         }
 
-        /* 紧凑监控中心 */
+        /* 紧凑监控中心 - 响应式优化 */
         .nature-hub {
             position: sticky; top: 0; z-index: 1000;
-            background: rgba(6, 18, 11, 0.9);
+            background: rgba(6, 18, 11, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 2px solid var(--core-hex);
-            padding: 10px 30px;
+            padding: 10px 20px;
             display: flex; align-items: center; justify-content: space-between;
             height: 80px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
-        .nature-hub.collapsed { height: 0; padding: 0 30px; border-bottom: none; overflow: hidden; }
+        .nature-hub.collapsed { height: 0; padding: 0 20px; border-bottom: none; }
 
-        .monitor-group { display: flex; align-items: center; gap: 40px; flex-grow: 1; }
+        .monitor-group { display: flex; align-items: center; gap: 20px; flex-grow: 1; min-width: 0; }
 
         #core-display {
-            font-size: 32px; font-weight: 900; color: var(--core-hex);
+            font-size: clamp(20px, 5vw, 32px); font-weight: 900; color: var(--core-hex);
             text-shadow: 0 0 15px rgba(39, 174, 96, 0.5);
-            min-width: 140px; text-transform: uppercase;
+            min-width: 100px; text-transform: uppercase;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .logic-view { border-left: 1px solid rgba(255,255,255,0.1); padding-left: 30px; }
-        .logic-tag { font-size: 10px; color: var(--accent); letter-spacing: 2px; margin-bottom: 2px; }
-        #logic-text { font-size: 16px; color: #ecf0f1; font-weight: 500; }
+        .logic-view { border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; min-width: 0; }
+        .logic-tag { font-size: 9px; color: var(--accent); letter-spacing: 2px; margin-bottom: 2px; white-space: nowrap; }
+        #logic-text { font-size: 15px; color: #ecf0f1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .ui-close { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+        .ui-close { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; flex-shrink: 0; margin-left: 10px; }
 
         /* 紧凑网格 */
         .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 25px; }
@@ -63,26 +66,29 @@
 </head>
 <body>
 
-    <div class="trigger-btn" id="open-btn" onclick="setPanel(true)">OPEN MONITOR</div>
+    <div class="trigger-btn" id="open-btn" onclick="setPanel(true)">OPEN ANALYZER</div>
 
     <div class="nature-hub" id="hub">
         <div class="monitor-group">
-            <div id="core-display">NATURE</div>
+            <div id="core-display">READY</div>
             <div class="logic-view">
                 <div class="logic-tag">ENVIRONMENTAL LOGIC DECODER</div>
-                <div id="logic-text">点击词条开始解析...</div>
+                <div id="logic-text">点击词条启动逻辑解码...</div>
             </div>
         </div>
         <button class="ui-close" onclick="setPanel(false)">CLOSE</button>
     </div>
 
-    <div class="vocab-grid" id="container">加载中...</div>
+    <div class="vocab-grid" id="container">
+        <div style="grid-column: 1/-1; text-align: center; opacity: 0.5; padding: 50px;">📡 正在同步远程数据中心...</div>
+    </div>
 
     <script>
         const coreEl = document.getElementById('core-display');
         const logicEl = document.getElementById('logic-text');
         const hub = document.getElementById('hub');
         const openBtn = document.getElementById('open-btn');
+        const container = document.getElementById('container');
 
         function setPanel(show) {
             if(show) { hub.classList.remove('collapsed'); openBtn.style.display = 'none'; }
@@ -91,8 +97,13 @@
 
         function activate(item, el) {
             if(hub.classList.contains('collapsed')) setPanel(true);
+            
             coreEl.innerText = item.core;
             logicEl.innerText = "⚛️ " + item.logic;
+            
+            // 动效反馈
+            coreEl.style.transform = "scale(1.15)";
+            setTimeout(() => coreEl.style.transform = "scale(1)", 200);
             
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
@@ -103,10 +114,13 @@
             window.speechSynthesis.speak(speech);
         }
 
+        // GitHub 路径加载优化
         fetch('data.json')
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('Data linkage failed');
+                return res.json();
+            })
             .then(data => {
-                const container = document.getElementById('container');
                 container.innerHTML = "";
                 data.forEach(item => {
                     const card = document.createElement('div');
@@ -119,6 +133,11 @@
                     `;
                     container.appendChild(card);
                 });
+            })
+            .catch(err => {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--accent); padding: 50px;">
+                    ❌ 核心连接错误: 请确保 data.json 文件与 index.html 处于同一目录且命名正确。
+                </div>`;
             });
     </script>
 </body>
