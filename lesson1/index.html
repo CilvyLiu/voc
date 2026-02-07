@@ -105,66 +105,97 @@
 
     <div class="vocab-grid" id="vocab-container">正在加载 L1 核心样本...</div>
 
-    <script>
-        const coreEl = document.getElementById('active-core');
-        const detailEl = document.getElementById('logic-detail');
-        const hub = document.getElementById('hub');
-        const showBtn = document.getElementById('show-btn');
+    const coreEl = document.getElementById('active-core');
+const detailEl = document.getElementById('logic-detail');
+const hub = document.getElementById('hub');
+const showBtn = document.getElementById('show-btn');
 
-        function toggleHub() {
-            const isCollapsed = hub.classList.toggle('collapsed');
-            showBtn.style.display = isCollapsed ? 'block' : 'none';
-        }
+// --- 关键：TTS 预热逻辑 ---
+let ttsUnlocked = false;
+function unlockTTS() {
+    if (ttsUnlocked) return;
+    // 播放一个极短的静音，解锁 iOS 音频限制
+    const msg = new SpeechSynthesisUtterance(" ");
+    msg.volume = 0;
+    window.speechSynthesis.speak(msg);
+    ttsUnlocked = true;
+    console.log("TTS 已解锁");
+    // 移除全局监听
+    document.removeEventListener('click', unlockTTS);
+    document.removeEventListener('touchstart', unlockTTS);
+}
+// 监听用户第一次交互
+document.addEventListener('click', unlockTTS);
+document.addEventListener('touchstart', unlockTTS);
 
-        function speak(text) {
-            window.speechSynthesis.cancel(); // 停止当前播放，防止堆叠
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'en-US';
-            msg.rate = 0.9;
-            window.speechSynthesis.speak(msg);
-        }
+function toggleHub() {
+    const isCollapsed = hub.classList.toggle('collapsed');
+    showBtn.style.display = isCollapsed ? 'block' : 'none';
+}
 
-        function analyze(item, element) {
-            // 如果面板是关着的，点击时自动滑出
-            if(hub.classList.contains('collapsed')) toggleHub();
+function speak(text) {
+    // 1. 先取消所有排队的语音（移动端必须清空队列）
+    window.speechSynthesis.cancel(); 
 
-            coreEl.innerText = item.core;
-            detailEl.innerHTML = `<strong style="color:var(--edge)">${item.word.toUpperCase()}</strong>: ${item.logic}`;
+    // 2. 创建实例
+    const msg = new SpeechSynthesisUtterance(text);
+    
+    // 3. 兼容性配置
+    msg.lang = 'en-US';
+    msg.rate = 0.9;
+    msg.pitch = 1.0;
+    msg.volume = 1.0;
+
+    // 4. 解决 Chrome/iOS 偶尔的“假死”Bug
+    // 确保在播放结束后释放内存
+    msg.onend = function() {
+        console.log('播放完成');
+    };
+
+    // 5. 正式执行
+    window.speechSynthesis.speak(msg);
+}
+
+function analyze(item, element) {
+    if(hub.classList.contains('collapsed')) toggleHub();
+
+    coreEl.innerText = item.core;
+    detailEl.innerHTML = `<strong style="color:var(--edge)">${item.word.toUpperCase()}</strong>: ${item.logic}`;
+    
+    coreEl.style.transform = "scale(1.2) rotate(360deg)";
+    setTimeout(() => coreEl.style.transform = "scale(1) rotate(0deg)", 400);
+
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    element.classList.add('active');
+    
+    // 调用语音
+    speak(item.word);
+}
+
+// 异步加载 data.json (保持不变)
+fetch('data.json')
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('vocab-container');
+        container.innerHTML = "";
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => analyze(item, card);
             
-            // 动效反馈
-            coreEl.style.transform = "scale(1.2) rotate(360deg)";
-            setTimeout(() => coreEl.style.transform = "scale(1) rotate(0deg)", 400);
-
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            element.classList.add('active');
-            speak(item.word);
-        }
-
-        // 异步加载 data.json
-        fetch('data.json')
-            .then(res => res.json())
-            .then(data => {
-                const container = document.getElementById('vocab-container');
-                container.innerHTML = ""; // 清空加载提示
-                data.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => analyze(item, card);
-                    
-                    card.innerHTML = `
-                        <div class="word-row">
-                            <span class="word">${item.word}</span>
-                            <button class="btn-audio" onclick="event.stopPropagation(); speak('${item.word}')">🔊</button>
-                        </div>
-                        <div class="meaning">${item.chinese}</div>
-                        <div class="example-txt">${item.example}</div>
-                    `;
-                    container.appendChild(card);
-                });
-            })
-            .catch(err => {
-                document.getElementById('vocab-container').innerHTML = "数据加载失败，请检查 data.json 是否在当前目录。";
-            });
-    </script>
+            card.innerHTML = `
+                <div class="word-row">
+                    <span class="word">${item.word}</span>
+                    <button class="btn-audio" onclick="event.stopPropagation(); speak('${item.word}')">🔊</button>
+                </div>
+                <div class="meaning">${item.chinese}</div>
+                <div class="example-txt">${item.example}</div>
+            `;
+            container.appendChild(card);
+        });
+    })
+    .catch(err => {
+        document.getElementById('vocab-container').innerHTML = "数据加载失败，请检查 data.json 是否在当前目录。";
+    });
 </body>
 </html>
