@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova's Vocab Quiz | 全课次通用</title>
+    <style>
+        :root { --accent: #2ed573; --bg: #0d1117; --card: #161b22; --text: #e6edf3; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; }
+        
+        /* 选择界面 */
+        #setup-screen { margin-top: 50px; text-align: center; width: 90%; max-width: 500px; }
+        .lesson-select { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .lesson-btn { background: var(--card); border: 1px solid #30363d; color: var(--text); padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .lesson-btn:hover { border-color: var(--accent); background: #21262d; }
+        .lesson-btn.active { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(46, 213, 115, 0.2); }
+
+        /* 游戏界面 */
+        #game-box { display: none; width: 90%; max-width: 600px; margin-top: 80px; text-align: center; }
+        .progress-bar { width: 100%; height: 4px; background: #30363d; border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.3s; }
+        
+        .logic-hint { font-size: 1.3em; color: var(--accent); margin-bottom: 30px; min-height: 80px; padding: 20px; background: rgba(46, 213, 115, 0.05); border-radius: 12px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        button.option { 
+            background: var(--card); border: 1px solid #30363d; color: var(--text); padding: 20px; 
+            border-radius: 12px; cursor: pointer; font-size: 1.1em; transition: 0.2s;
+        }
+        button.option:hover { transform: translateY(-2px); border-color: var(--accent); }
+        button.correct { background: var(--accent) !important; color: #000 !important; font-weight: bold; border-color: var(--accent); }
+        button.wrong { background: #f85149 !important; border-color: #f85149; }
+
+        /* 评分显示 */
+        #score-board { display: none; text-align: center; margin-top: 50px; }
+        .rank-circle { width: 120px; height: 120px; border-radius: 50%; border: 6px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 3em; margin: 20px auto; font-weight: bold; color: var(--accent); }
+        .btn-main { background: var(--accent); color: #000; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="setup-screen">
+        <h1>🧪 选择实验课次</h1>
+        <p>请选择要进行全息测验的模块：</p>
+        <div class="lesson-select">
+            <button class="lesson-btn" onclick="startQuiz(1)">L1: Survival</button>
+            <button class="lesson-btn" onclick="startQuiz(2)">L2: Education</button>
+            <button class="lesson-btn" onclick="startQuiz(3)">L3: Nature</button>
+            <button class="lesson-btn" onclick="startQuiz(4)">L4: Environment</button>
+            <button class="lesson-btn" onclick="startQuiz(5)">L5: Technology</button>
+            <button class="lesson-btn" onclick="startQuiz(6)">L6: Culture</button>
+            <button class="lesson-btn" onclick="startQuiz(7)">L7: Medicine</button>
+        </div>
+        <button class="btn-main" style="background:#30363d; color:white" onclick="location.href='index.html'">返回主门户</button>
+    </div>
+
+    <div id="game-box">
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        <div id="quest-area">
+            <div class="logic-hint" id="hint">加载数据中...</div>
+            <div class="options-grid" id="options"></div>
+        </div>
+
+        <div id="score-board">
+            <h2>评估结果报告</h2>
+            <div class="rank-circle" id="rank">S</div>
+            <p id="accuracy">得分: 0 / 0</p>
+            <button class="btn-main" onclick="location.reload()">重新挑战</button>
+            <button class="btn-main" style="background:#30363d; color:white; margin-left:10px;" onclick="location.href='index.html'">返回首页</button>
+        </div>
+    </div>
+
+<script>
+    let vocabulary = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    async function startQuiz(lessonNum) {
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('game-box').style.display = 'block';
+        
+        try {
+            // 动态路径：自动去对应文件夹下找 data.json
+            const response = await fetch(`./lesson${lessonNum}/data.json`);
+            const data = await response.json();
+            vocabulary = data.sort(() => Math.random() - 0.5);
+            showQuestion();
+        } catch (error) {
+            alert(`无法加载 Lesson ${lessonNum} 的数据，请检查路径。`);
+            location.reload();
+        }
+    }
+
+    function showQuestion() {
+        if (currentIndex >= vocabulary.length) {
+            showResult();
+            return;
+        }
+
+        const current = vocabulary[currentIndex];
+        document.getElementById('progress-fill').style.width = (currentIndex / vocabulary.length) * 100 + "%";
+        document.getElementById('hint').innerHTML = `<small style="opacity:0.6">逻辑线索：</small><br>${current.logic}`;
+
+        let choices = [current.word];
+        while (choices.length < 4) {
+            let rand = vocabulary[Math.floor(Math.random() * vocabulary.length)].word;
+            if (!choices.includes(rand)) choices.push(rand);
+        }
+        choices.sort(() => Math.random() - 0.5);
+
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+        choices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerText = choice;
+            btn.onclick = () => checkAnswer(choice, current.word, btn);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, correct, btn) {
+        const btns = document.querySelectorAll('.option');
+        btns.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score++;
+            const speech = new SpeechSynthesisUtterance(correct);
+            speech.lang = 'en-US';
+            window.speechSynthesis.speak(speech);
+        } else {
+            btn.classList.add('wrong');
+            btns.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
+        }
+
+        setTimeout(() => {
+            currentIndex++;
+            showQuestion();
+        }, 1000);
+    }
+
+    function showResult() {
+        document.getElementById('quest-area').style.display = 'none';
+        document.getElementById('score-board').style.display = 'block';
+        const percent = Math.round((score / vocabulary.length) * 100);
+        document.getElementById('accuracy').innerText = `最终成绩: ${score} / ${vocabulary.length} (${percent}%)`;
+        
+        let rank = 'C';
+        if (percent >= 95) rank = 'S';
+        else if (percent >= 80) rank = 'A';
+        else if (percent >= 60) rank = 'B';
+        document.getElementById('rank').innerText = rank;
+    }
+</script>
+</body>
+</html>
