@@ -91,7 +91,7 @@
         <div class="core-visual" id="active-core">ROOT</div>
         <div class="status-panel">
             <div class="status-tag">DECODING LOGIC MAP</div>
-            <p id="logic-detail">请点击单词卡片以激活全息扫描...</p>
+            <p id="logic-detail">请点任意位置激活实验音频...</p>
         </div>
         <div class="control-area">
             <button class="btn-ui" onclick="toggleHub()">CLOSE</button>
@@ -99,7 +99,7 @@
         </div>
     </div>
 
-    <div class="vocab-grid" id="vocab-container">正在初始化实验室环境...</div>
+    <div class="vocab-grid" id="vocab-container">正在同步数据...</div>
 
     <script>
         const coreEl = document.getElementById('active-core');
@@ -107,70 +107,84 @@
         const hub = document.getElementById('hub');
         const showBtn = document.getElementById('show-btn');
 
-        // --- 核心补丁：解锁移动端音频通道 ---
+        // --- 核心补丁：多模式音频激活 ---
         let audioUnlocked = false;
 
         function unlockAudio() {
             if (audioUnlocked) return;
-            // 播放一个静音文本，这是 iOS 必须的“手势激活”动作
-            const unlockMsg = new SpeechSynthesisUtterance(" ");
-            unlockMsg.volume = 0;
+            
+            // 1. 激活原生合成器
+            const unlockMsg = new SpeechSynthesisUtterance("");
             window.speechSynthesis.speak(unlockMsg);
             
+            // 2. 激活音频上下文 (针对某些回退引擎)
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            context.resume();
+
             audioUnlocked = true;
-            console.log("Audio Channel Unlocked");
+            console.log("全系统音频锁定解除");
+            detailEl.innerText = "系统就绪。请选择单词开始扫描。";
             
-            // 激活后移除监听，防止重复触发
             document.removeEventListener('touchstart', unlockAudio);
             document.removeEventListener('click', unlockAudio);
         }
 
-        // 同时监听 touch 和 click 确保在任何移动端都能触发 unlock
         document.addEventListener('touchstart', unlockAudio, {passive: true});
         document.addEventListener('click', unlockAudio);
+
+        // --- 核心补丁：双引擎朗读函数 ---
+        function speak(text) {
+            window.speechSynthesis.cancel(); // 停止当前所有任务
+
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            msg.rate = 0.9;
+            msg.volume = 1.0;
+
+            // 设置一个“超时检查”：如果 500ms 内原生系统没声音，自动切到云端引擎
+            let hasStarted = false;
+            const fallbackTimer = setTimeout(() => {
+                if (!hasStarted) {
+                    console.log("系统合成器卡死，切换云端接口...");
+                    const fallbackUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+                    const audio = new Audio(fallbackUrl);
+                    audio.play().catch(e => console.error("全部音频通道失效:", e));
+                }
+            }, 500);
+
+            msg.onstart = () => {
+                hasStarted = true;
+                clearTimeout(fallbackTimer);
+            };
+
+            window.speechSynthesis.speak(msg);
+            
+            // iOS 必须手动唤醒
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            }
+        }
 
         function toggleHub() {
             const isCollapsed = hub.classList.toggle('collapsed');
             showBtn.style.display = isCollapsed ? 'block' : 'none';
         }
 
-        function speak(text) {
-            // 1. 强力重置队列 (解决手机堆叠不发声问题)
-            window.speechSynthesis.cancel();
-
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'en-US';
-            msg.rate = 0.9;
-            msg.pitch = 1.0;
-            msg.volume = 1.0;
-
-            // 2. iOS 特殊唤醒补丁
-            window.speechSynthesis.speak(msg);
-            if (window.speechSynthesis.paused) {
-                window.speechSynthesis.resume();
-            }
-        }
-
         function analyze(item, element) {
-            // 如果面板是关着的，点击时滑出
             if(hub.classList.contains('collapsed')) toggleHub();
 
             coreEl.innerText = item.core;
             detailEl.innerHTML = `<strong style="color:var(--edge)">${item.word.toUpperCase()}</strong>: ${item.logic}`;
             
-            // 视觉动效
             coreEl.style.transform = "scale(1.2) rotate(360deg)";
             setTimeout(() => coreEl.style.transform = "scale(1) rotate(0deg)", 400);
 
-            // 卡片状态切换
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
             
-            // 执行朗读
             speak(item.word);
         }
 
-        // 异步加载数据
         fetch('data.json')
             .then(res => res.json())
             .then(data => {
@@ -179,7 +193,6 @@
                 data.forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'card';
-                    // 移动端 click 会被转换，保持 onclick 即可
                     card.onclick = () => analyze(item, card);
                     
                     card.innerHTML = `
@@ -194,7 +207,7 @@
                 });
             })
             .catch(err => {
-                document.getElementById('vocab-container').innerHTML = "数据加载失败。请确保 data.json 路径正确。";
+                document.getElementById('vocab-container').innerHTML = "数据加载失败。";
             });
     </script>
 </body>
