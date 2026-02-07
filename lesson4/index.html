@@ -10,7 +10,7 @@
         }
         body { 
             font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; 
-            -webkit-tap-highlight-color: transparent; /* 移除移动端点击蓝框 */
+            -webkit-tap-highlight-color: transparent;
         }
         
         .trigger-btn {
@@ -33,7 +33,6 @@
         }
 
         .nature-hub.collapsed { height: 0; padding: 0 20px; border-bottom: none; }
-
         .monitor-group { display: flex; align-items: center; gap: 25px; flex-grow: 1; min-width: 0; }
 
         #core-display {
@@ -49,7 +48,6 @@
 
         .ui-close { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 10px; flex-shrink: 0; }
 
-        /* 响应式卡片网格 */
         .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 25px; }
         
         .card {
@@ -101,32 +99,33 @@
         const openBtn = document.getElementById('open-btn');
         const container = document.getElementById('container');
 
-        // --- 核心修复：音频激活锁 ---
-        let audioUnlocked = false;
-        function unlockAudio() {
-            if (audioUnlocked) return;
-            // 播放静音片段激活移动端音频上下文
-            const msg = new SpeechSynthesisUtterance("");
-            window.speechSynthesis.speak(msg);
-            audioUnlocked = true;
-            console.log("Audio Context Unlocked");
-            document.removeEventListener('click', unlockAudio);
-            document.removeEventListener('touchstart', unlockAudio);
+        // iOS/Android 音频预热逻辑
+        function preheatAudio() {
+            const dummy = new Audio();
+            dummy.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA== ";
+            dummy.play().catch(()=>{});
+            document.removeEventListener('touchstart', preheatAudio);
         }
-        document.addEventListener('click', unlockAudio);
-        document.addEventListener('touchstart', unlockAudio, {passive: true});
+        document.addEventListener('touchstart', preheatAudio);
 
         function setPanel(show) {
             if(show) { hub.classList.remove('collapsed'); openBtn.style.display = 'none'; }
             else { hub.classList.add('collapsed'); openBtn.style.display = 'block'; }
         }
 
-        function speak(text) {
-            window.speechSynthesis.cancel();
-            const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = 'en-US';
-            speech.rate = 0.9;
-            window.speechSynthesis.speak(speech);
+        // 标准英音核心发音逻辑 (type=2)
+        function playUKEnglish(text) {
+            const audioUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+            const audio = new Audio(audioUrl);
+            
+            audio.play().catch(() => {
+                // 离线兜底：使用系统原生大不列颠发音
+                window.speechSynthesis.cancel();
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.lang = 'en-GB';
+                speech.rate = 0.9;
+                window.speechSynthesis.speak(speech);
+            });
         }
 
         function activate(item, el) {
@@ -135,7 +134,7 @@
             coreEl.innerText = item.core;
             logicEl.innerText = "⚡ " + item.logic;
             
-            // 增强动效：颜色切换 + 缩放跳动
+            // 能量脉冲动效
             coreEl.style.color = "var(--accent)";
             coreEl.style.transform = "scale(1.1) rotate(-2deg)";
             setTimeout(() => {
@@ -146,14 +145,11 @@
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
 
-            speak(item.word);
+            playUKEnglish(item.word);
         }
 
         fetch('data.json')
-            .then(res => {
-                if (!res.ok) throw new Error('Data linking failed');
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
                 container.innerHTML = "";
                 data.forEach(item => {
@@ -170,7 +166,7 @@
             })
             .catch(err => {
                 container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--accent); padding: 50px;">
-                    ❌ 能源链路故障：请确认 data.json 位于 lesson 目录下。
+                    ❌ 能源链路故障：数据文件同步失败。
                 </div>`;
             });
     </script>
