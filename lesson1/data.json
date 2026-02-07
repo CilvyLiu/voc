@@ -1,425 +1,49 @@
 [
-  {
-    "id": 1,
-    "word": "travel",
-    "pos": "v./n.",
-    "chinese": "旅行，游历；长途行走",
-    "example": "I love to travel around the world and experience different cultures.",
-    "core": "弥散的场",
-    "logic": "无固定形状，像溶剂一样在世界这个容器里扩散。"
-  },
-  {
-    "id": 2,
-    "word": "trip",
-    "pos": "n./v.",
-    "chinese": "旅行，旅游；绊倒",
-    "example": "We're planning a trip to the mountains next month.",
-    "core": "点对点",
-    "logic": "通常指短途、有目的的往返。想象从 A 点弹跳到 B 点。"
-  },
-  {
-    "id": 3,
-    "word": "tour",
-    "pos": "n./v.",
-    "chinese": "旅行，观光；巡回演出",
-    "example": "The band is on a world tour.",
-    "core": "圆圈 (Tour=Turn)",
-    "logic": "绕着特定的路线转一圈，最后回到原点。"
-  },
-  {
-    "id": 4,
-    "word": "journey",
-    "pos": "n./v.",
-    "chinese": "旅程；（尤指长途）旅行",
-    "example": "The journey by train is very scenic.",
-    "core": "长线",
-    "logic": "强调在路上的时间感和跨度，不一定回到原点。"
-  },
-  {
-    "id": 5,
-    "word": "voyage",
-    "pos": "n./v.",
-    "chinese": "航行，航海；航天",
-    "example": "The Titanic's maiden voyage was tragic.",
-    "core": "深蓝/深空",
-    "logic": "涉及巨大空间的跨越，通常指水上或宇宙。"
-  },
-  {
-    "id": 6,
-    "word": "vacation",
-    "pos": "n./v.",
-    "chinese": "假期，休假；度假",
-    "example": "We're going on vacation to the beach this summer.",
-    "core": "真空 (Vac=Empty)",
-    "logic": "清空大脑和工作，留下空白的时间。"
-  },
-  {
-    "id": 7,
-    "word": "prepare",
-    "pos": "v.",
-    "chinese": "准备，筹备",
-    "example": "She is preparing for the exam.",
-    "core": "预先产出 (Pre+Pare)",
-    "logic": "在事情发生前，先把需要的零件生产出来。"
-  },
-  {
-    "id": 8,
-    "word": "passport",
-    "pos": "n.",
-    "chinese": "护照；途径",
-    "example": "You need a valid passport to travel abroad.",
-    "core": "通过港口 (Pass+Port)",
-    "logic": "通过港口/关口的通行证。没有它，物理边界无法穿透。"
-  },
-  {
-    "id": 9,
-    "word": "embassy",
-    "pos": "n.",
-    "chinese": "大使馆",
-    "example": "He works at the embassy.",
-    "core": "外交基站",
-    "logic": "本国在外国领土上的能量延伸点。"
-  },
-  {
-    "id": 10,
-    "word": "exit",
-    "pos": "n./v.",
-    "chinese": "出口；退场",
-    "example": "Please use the emergency exit in case of fire.",
-    "core": "向外走 (Ex+It)",
-    "logic": "Ex(出) + It(走)。指向外部的离去动作。"
-  },
-  {
-    "id": 11,
-    "word": "entry",
-    "pos": "n.",
-    "chinese": "进入；入口",
-    "example": "Entry to the museum is free.",
-    "core": "向内入 (En+Try)",
-    "logic": "向内部空间的切入动作。"
-  },
-  {
-    "id": 12,
-    "word": "administration",
-    "pos": "n.",
-    "chinese": "管理；行政",
-    "example": "The new administration has implemented reforms.",
-    "core": "执行服务",
-    "logic": "Minister(仆人)。像执行者一样去打理事务。"
-  },
-  {
-    "id": 13,
-    "word": "ministry",
-    "pos": "n.",
-    "chinese": "（政府的）部",
-    "example": "He works in the Ministry of Education.",
-    "core": "功能模块",
-    "logic": "政府这个大机器里的一个执行部件。"
-  },
-  {
-    "id": 14,
-    "word": "security",
-    "pos": "n./adj.",
-    "chinese": "安全；保安",
-    "example": "We need to pay attention to security when traveling.",
-    "core": "隔离忧虑 (Se+Cure)",
-    "logic": "Se(分开) + Cure(挂念)。把不安全感隔离开。"
-  },
-  {
-    "id": 15,
-    "word": "visa",
-    "pos": "n./v.",
-    "chinese": "签证；签发签证",
-    "example": "I need to apply for a visa to go to that country.",
-    "core": "被看见 (Vis=See)",
-    "logic": "官方已经“看”过并确认了你的背景。"
-  },
-  {
-    "id": 16,
-    "word": "apply",
-    "pos": "v.",
-    "chinese": "申请；应用",
-    "example": "He applied for a job in the company.",
-    "core": "折叠趋向 (Ap+Ply)",
-    "logic": "将自己“折叠”并投递出去。引申为涂抹或申请。"
-  },
-  {
-    "id": 17,
-    "word": "issue",
-    "pos": "n./v.",
-    "chinese": "问题；发行；发布",
-    "example": "The government will issue new policies.",
-    "core": "流出/出口",
-    "logic": "像水从出口流出。杂志发行、政策发布、问题的冒出。"
-  },
-  {
-    "id": 18,
-    "word": "authority",
-    "pos": "n.",
-    "chinese": "权力；当局",
-    "example": "The local authorities are responsible for public order.",
-    "core": "创造者 (Auth=Author)",
-    "logic": "规则的创作者，即拥有掌控权的人。"
-  },
-  {
-    "id": 19,
-    "word": "luggage",
-    "pos": "n.",
-    "chinese": "行李",
-    "example": "He left his luggage at the airport.",
-    "core": "拖拽物 (Lug=Drag)",
-    "logic": "强调需要费力拖动的东西。物理属性强。"
-  },
-  {
-    "id": 20,
-    "word": "baggage",
-    "pos": "n.",
-    "chinese": "行李；包袱",
-    "example": "How much baggage can I take on the plane?",
-    "core": "袋状载具",
-    "logic": "比Luggage更抽象，可指心理包袱。"
-  },
-  {
-    "id": 21,
-    "word": "agency",
-    "pos": "n.",
-    "chinese": "代理机构",
-    "example": "I booked the hotel through a travel agency.",
-    "core": "动作发起处 (Ag=Do)",
-    "logic": "帮你“做事”的地方。中介、代理。"
-  },
-  {
-    "id": 22,
-    "word": "reserve",
-    "pos": "v./n.",
-    "chinese": "预订；保留",
-    "example": "We reserved a table at the restaurant.",
-    "core": "往回留 (Re+Serve)",
-    "logic": "提前往回拉住，不让别人拿走。"
-  },
-  {
-    "id": 23,
-    "word": "inn",
-    "pos": "n.",
-    "chinese": "小旅馆；客栈",
-    "example": "We stayed at a cozy inn in the mountains.",
-    "core": "内部空间 (In)",
-    "logic": "路人可以进入躲避风雨的小空间。"
-  },
-  {
-    "id": 24,
-    "word": "accommodation",
-    "pos": "n.",
-    "chinese": "住处；住宿",
-    "example": "The accommodation in this hotel is very comfortable.",
-    "core": "模式匹配 (Mod=Mode)",
-    "logic": "提供一种适合人居住的空间模式。"
-  },
-  {
-    "id": 25,
-    "word": "dormitory",
-    "pos": "n.",
-    "chinese": "集体宿舍",
-    "example": "The dormitory is equipped with modern facilities.",
-    "core": "睡眠室 (Dorm=Sleep)",
-    "logic": "专门提供集体睡眠能量回收的场所。"
-  },
-  {
-    "id": 26,
-    "word": "residence",
-    "pos": "n.",
-    "chinese": "住宅；住所",
-    "example": "He has a beautiful residence in the countryside.",
-    "core": "长久坐落 (Sid=Sit)",
-    "logic": "Re(反复) + Sid(坐)。一个人反复坐下的地方，即家。"
-  },
-  {
-    "id": 27,
-    "word": "escalator",
-    "pos": "n.",
-    "chinese": "自动扶梯",
-    "example": "Take the escalator to the second floor.",
-    "core": "阶梯化提升 (Scal=Scale)",
-    "logic": "像比例尺一样一阶一阶向上提升。"
-  },
-  {
-    "id": 28,
-    "word": "elevator",
-    "pos": "n.",
-    "chinese": "电梯",
-    "example": "The elevator is out of order.",
-    "core": "变轻上升 (Lev=Light)",
-    "logic": "Lev(轻)。使重物变轻并垂直运送的机器。"
-  },
-  {
-    "id": 29,
-    "word": "lobby",
-    "pos": "n./v.",
-    "chinese": "大厅；游说",
-    "example": "We met in the lobby of the hotel.",
-    "core": "连接通道",
-    "logic": "连接外部世界与内部房间的灰空间。"
-  },
-  {
-    "id": 30,
-    "word": "reception",
-    "pos": "n.",
-    "chinese": "接待；接待处",
-    "example": "The reception at the hotel was very warm.",
-    "core": "接纳拿取 (Cept=Take)",
-    "logic": "Re(回) + Cept(拿)。把访客接进来。"
-  },
-  {
-    "id": 31,
-    "word": "laundry",
-    "pos": "n.",
-    "chinese": "洗衣房；要洗的衣物",
-    "example": "I need to take my laundry to the laundry.",
-    "core": "洗涤流 (Lau=Wash)",
-    "logic": "水的流动带走污垢的场所。"
-  },
-  {
-    "id": 32,
-    "word": "departure",
-    "pos": "n.",
-    "chinese": "离开；出发",
-    "example": "The departure time of the flight is 9 o'clock.",
-    "core": "分离 (De+Part)",
-    "logic": "De(离开) + Part(部分)。从原来的部分分离开。"
-  },
-  {
-    "id": 33,
-    "word": "check",
-    "pos": "v./n.",
-    "chinese": "检查；审查；支票",
-    "example": "Please check your luggage before you leave.",
-    "core": "阻断确认",
-    "logic": "停下来确认状态。支票是对账单的确认。"
-  },
-  {
-    "id": 34,
-    "word": "destination",
-    "pos": "n.",
-    "chinese": "目的地",
-    "example": "Our destination is a small town by the sea.",
-    "core": "注定之所 (Destin=Destiny)",
-    "logic": "终点即命运，是你必须抵达的那个坐标。"
-  },
-  {
-    "id": 35,
-    "word": "attraction",
-    "pos": "n.",
-    "chinese": "吸引；景点",
-    "example": "The Great Wall is a major tourist attraction in China.",
-    "core": "向内拉 (At+Tract)",
-    "logic": "Tract(拉)。一股把你吸引过去的力量或场所。"
-  },
-  {
-    "id": 36,
-    "word": "heritage",
-    "pos": "n.",
-    "chinese": "遗产",
-    "example": "We should protect our cultural heritage.",
-    "core": "继承流 (Her=Heir)",
-    "logic": "时间维度上，从祖辈流传下来的能量。"
-  },
-  {
-    "id": 37,
-    "word": "museum",
-    "pos": "n.",
-    "chinese": "博物馆",
-    "example": "We visited the history museum last weekend.",
-    "core": "缪斯之地 (Muse)",
-    "logic": "存放艺术与科学灵感的圣殿。"
-  },
-  {
-    "id": 38,
-    "word": "gallery",
-    "pos": "n.",
-    "chinese": "画廊",
-    "example": "There is an art exhibition in the gallery.",
-    "core": "展示长廊",
-    "logic": "词源同Gal(快乐)，让人享受视觉愉悦的走廊。"
-  },
-  {
-    "id": 39,
-    "word": "cathedral",
-    "pos": "n.",
-    "chinese": "大教堂",
-    "example": "The cathedral is a magnificent building.",
-    "core": "主教之座 (Hedra=Seat)",
-    "logic": "拥有主教宝座的最高规格教堂。"
-  },
-  {
-    "id": 40,
-    "word": "souvenir",
-    "pos": "n.",
-    "chinese": "纪念品",
-    "example": "I bought a lot of souvenirs during my trip.",
-    "core": "唤起记忆 (Ven=Come)",
-    "logic": "Sou(下) + Ven(来)。让记忆在脑海下方浮现出来的物体。"
-  },
-  {
-    "id": 41,
-    "word": "scenic",
-    "pos": "adj.",
-    "chinese": "风景优美的",
-    "example": "We took a drive along the scenic route.",
-    "core": "如剧幕一般 (Scene)",
-    "logic": "美得像舞台布景一样的风景。"
-  },
-  {
-    "id": 42,
-    "word": "pleasant",
-    "pos": "adj.",
-    "chinese": "令人愉快的",
-    "example": "It was a pleasant trip.",
-    "core": "舒适区 (Please)",
-    "logic": "满足感官，没有攻击性的愉悦。"
-  },
-  {
-    "id": 43,
-    "word": "attractive",
-    "pos": "adj.",
-    "chinese": "有吸引力的",
-    "example": "The city has many attractive places to visit.",
-    "core": "磁力感知",
-    "logic": "像磁铁一样能拉住目光的状态。"
-  },
-  {
-    "id": 44,
-    "word": "fascinating",
-    "pos": "adj.",
-    "chinese": "极有吸引力的",
-    "example": "The story is really fascinating.",
-    "core": "被施咒 (Fascin=Spell)",
-    "logic": "美到像中了魔法一样，完全无法移开眼。"
-  },
-  {
-    "id": 45,
-    "word": "marvelous",
-    "pos": "adj.",
-    "chinese": "极好的；非凡的",
-    "example": "The view from the top of the mountain is marvelous.",
-    "core": "大理石般的奇迹 (Marv=Wonder)",
-    "logic": "像精美雕刻一样令人惊叹的。"
-  },
-  {
-    "id": 46,
-    "word": "picturesque",
-    "pos": "adj.",
-    "chinese": "风景如画的",
-    "example": "The village is really picturesque.",
-    "core": "画卷感 (Picture+Esque)",
-    "logic": "美得可以直接装进画框里。"
-  },
-  {
-    "id": 47,
-    "word": "magnificent",
-    "pos": "adj.",
-    "chinese": "壮丽的；宏伟的",
-    "example": "The palace is magnificent.",
-    "core": "大手笔 (Magni=Big)",
-    "logic": "Magni(大) + Fic(做)。宏大到震慑灵魂的美。"
-  }
+  { "word": "travel", "pos": "v./n.", "chinese": "旅行", "example": "Travel broadens the mind.", "core": "TRAV (痛苦/劳作)", "logic": "源自 travail。古代旅行不是享受，而是充满艰辛的跋涉。" },
+  { "word": "trip", "pos": "n./v.", "chinese": "旅游/绊倒", "example": "A business trip.", "core": "TRIP (轻快跳跃/失足)", "logic": "物理动作是‘脚尖着地’。引申为短途、轻快的往返旅行。" },
+  { "word": "tour", "pos": "n./v.", "chinese": "观光/巡回", "example": "A guided tour of the city.", "core": "TOUR (圆圈/转动)", "logic": "源自 turn。出发并绕一圈回到原点，强调‘环游’过程。" },
+  { "word": "journey", "pos": "n./v.", "chinese": "旅程", "example": "A long train journey.", "core": "JOURN (一天)", "logic": "源自 journal。原指‘一天的路程’，现强调漫长且艰辛的过程。" },
+  { "word": "voyage", "pos": "n./v.", "chinese": "航海/航天", "example": "A long sea voyage.", "core": "VOY (道路/路途)", "logic": "源自 via。特指在水上或太空这种广阔媒介中的长距离位移。" },
+  { "word": "vacation", "pos": "n./v.", "chinese": "假期", "example": "I'm on vacation.", "core": "VAC (空/腾出)", "logic": "把工作和责任‘清空’，留出时间给自己。" },
+  { "word": "prepare", "pos": "v.", "chinese": "准备", "example": "Prepare for the exam.", "core": "PRE (前) + PARE (安排)", "logic": "在事件发生之前，提前将其各就各位。" },
+  { "word": "passport", "pos": "n.", "chinese": "护照", "example": "Check your passport.", "core": "PASS + PORT (通过港口)", "logic": "准许你通过港口或城门的通行证。" },
+  { "word": "embassy", "pos": "n.", "chinese": "大使馆", "example": "The US Embassy.", "core": "AMB (周围/走去)", "logic": "代表国家在‘周围/外部’行使职权的机构。" },
+  { "word": "exit", "pos": "n./v.", "chinese": "出口", "example": "Emergency exit.", "core": "EX (外) + IT (走)", "logic": "字面意思：向外走。IT 是‘走’的词根（如 transit）。" },
+  { "word": "entry", "pos": "n.", "chinese": "进入/入口", "example": "The back entry.", "core": "EN (进入)", "logic": "动作的起始，进入某个空间或系统。" },
+  { "word": "administration", "pos": "n.", "chinese": "管理/行政", "example": "The school administration.", "core": "MINIS (服务/手下)", "logic": "Ad(加强)+Minis(服务)。通过服务来实现对整体的管控。" },
+  { "word": "ministry", "pos": "n.", "chinese": "（政府）部", "example": "Ministry of Education.", "core": "MINI (小/仆人)", "logic": "最初指为国家服务的仆人群体，后演变为政府部门。" },
+  { "word": "security", "pos": "n./adj.", "chinese": "安全/保安", "example": "Airport security.", "core": "SE (分开) + CURE (挂念)", "logic": "把忧虑（Cure/Care）隔离开，即为安全。" },
+  { "word": "visa", "pos": "n./v.", "chinese": "签证", "example": "Apply for a visa.", "core": "VIS (看)", "logic": "被官方‘看过/审阅过’后的准许标识。" },
+  { "word": "apply", "pos": "v.", "chinese": "申请/应用", "example": "Apply for a job.", "core": "PLIC (折叠)", "logic": "Ap(向)+Plic(折叠)。把自己的意愿‘折叠’进官方的流程中。" },
+  { "word": "issue", "pos": "n./v.", "chinese": "发行/问题", "example": "Issue a statement.", "core": "IS (出)", "logic": "流出来的东西。可以是发行的刊物，也可以是流出来的争议（问题）。" },
+  { "word": "authority", "pos": "n.", "chinese": "权威/当局", "example": "Health authorities.", "core": "AUG (增加/创造)", "logic": "源自 Author（作者）。创造了规则的人即拥有权威。" },
+  { "word": "luggage", "pos": "n.", "chinese": "行李", "example": "Hand luggage.", "core": "LUG (拉/拽)", "logic": "需要用力拖拉的东西。强调其沉重感。" },
+  { "word": "baggage", "pos": "n.", "chinese": "行李/负担", "example": "Emotional baggage.", "core": "BAG (袋子)", "logic": "装在袋子里的东西。常引申为心理上的负担。" },
+  { "word": "agency", "pos": "n.", "chinese": "代理/机构", "example": "Travel agency.", "core": "AG (做/驱动)", "logic": "替你去做事、去执行的媒介。" },
+  { "word": "reserve", "pos": "v./n.", "chinese": "预订/保留", "example": "Reserve a table.", "core": "RE (回) + SERV (守)", "logic": "为了以后使用，先把它看守住不让别人动。" },
+  { "word": "inn", "pos": "n.", "chinese": "小旅馆", "example": "A cozy inn.", "core": "IN (在内)", "logic": "指提供在内部遮风避雨的简单居所。" },
+  { "word": "accommodation", "pos": "n.", "chinese": "住处", "example": "Find accommodation.", "core": "MOD (模具/合适)", "logic": "Ac+Com+Mod。调节空间使之适应人的居住需求。" },
+  { "word": "dormitory", "pos": "n.", "chinese": "宿舍", "example": "Live in a dormitory.", "core": "DORM (睡眠)", "logic": "专门提供睡眠（Dormant）功能的集体空间。" },
+  { "word": "residence", "pos": "n.", "chinese": "住宅/居住", "example": "Private residence.", "core": "RE (回) + SID (坐)", "logic": "能让你往回坐下来的地方，即定居点。" },
+  { "word": "escalator", "pos": "n.", "chinese": "自动扶梯", "example": "Take the escalator.", "core": "SCALA (阶梯)", "logic": "源自 scale。自动向上攀升的阶梯。" },
+  { "word": "elevator", "pos": "n.", "chinese": "电梯", "example": "Use the elevator.", "core": "LEV (举起/轻)", "logic": "把沉重的东西变轻并举起来的装置。" },
+  { "word": "lobby", "pos": "n./v.", "chinese": "大厅/游说", "example": "Hotel lobby.", "core": "LOB (走廊/凉亭)", "logic": "连接内外的开放空间。在这里常发生各种游说活动。" },
+  { "word": "reception", "pos": "n.", "chinese": "接待", "example": "The reception desk.", "core": "CEPT (拿/取)", "logic": "Re(回)+Cept(拿)。接收并带回客人的服务动作。" },
+  { "word": "laundry", "pos": "n.", "chinese": "洗衣房", "example": "Do the laundry.", "core": "LAUND (洗/冲)", "logic": "源自 lav（如 lava/lavatory）。用于清洗的场所或物。" },
+  { "word": "departure", "pos": "n.", "chinese": "离开", "example": "Departure gate.", "core": "PART (部分/分开)", "logic": "De(离开)+Part(部分)。从整体中分出来，开始远行。" },
+  { "word": "check", "pos": "v./n.", "chinese": "检查", "example": "Check the ticket.", "core": "CHECK (格子/控制)", "logic": "源自国际象棋。通过对照来实施控制。" },
+  { "word": "destination", "pos": "n.", "chinese": "目的地", "example": "Reach the destination.", "core": "STIN (站立/建立)", "logic": "De(加强)+Stin(站)。最终稳定站立住的地方。" },
+  { "word": "attraction", "pos": "n.", "chinese": "吸引/景点", "example": "Tourist attraction.", "core": "TRACT (拉)", "logic": "At(向)+Tract(拉)。具有向心力，把人拉过去的事物。" },
+  { "word": "heritage", "pos": "n.", "chinese": "遗产", "example": "World Heritage.", "core": "HERIT (继承)", "logic": "代代相传、被法律或文化继承的财宝。" },
+  { "word": "museum", "pos": "n.", "chinese": "博物馆", "example": "History museum.", "core": "MUSE (缪斯/灵感)", "logic": "缪斯女神的神殿，激发灵感和艺术的场所。" },
+  { "word": "gallery", "pos": "n.", "chinese": "画廊", "example": "Art gallery.", "core": "GAL (欢庆/华丽)", "logic": "最初指华丽的走廊，后演变为陈列艺术的空间。" },
+  { "word": "cathedral", "pos": "n.", "chinese": "大教堂", "example": "St. Paul's Cathedral.", "core": "HED (坐)", "logic": "Cata(下)+Hed(坐)。主教‘坐下来’主持教务的主座教堂。" },
+  { "word": "souvenir", "pos": "n.", "chinese": "纪念品", "example": "Buy a souvenir.", "core": "VEN (来)", "logic": "Sou(从下面)+Ven(来)。让过去的记忆重新来到心头的物品。" },
+  { "word": "scenic", "pos": "adj.", "chinese": "风景优美的", "example": "A scenic route.", "core": "SCENE (幕布/布景)", "logic": "像舞台布景一样具有画面感的。" },
+  { "word": "pleasant", "pos": "adj.", "chinese": "令人愉快的", "example": "A pleasant trip.", "core": "PLEAS (讨好/满意)", "logic": "能让感官感到满意的状态。" },
+  { "word": "attractive", "pos": "adj.", "chinese": "有吸引力的", "example": "An attractive offer.", "core": "TRACT (拉)", "logic": "具有‘拉力’属性的。" },
+  { "word": "fascinating", "pos": "adj.", "chinese": "迷人的", "example": "A fascinating story.", "core": "FASCIN (捆绑/符咒)", "logic": "像被符咒捆绑住一样，目光无法移开。" },
+  { "word": "marvelous", "pos": "adj.", "chinese": "极好的", "example": "A marvelous day.", "core": "MARV (惊奇)", "logic": "源自 wonder。令人目瞪口呆的好。" },
+  { "word": "picturesque", "pos": "adj.", "chinese": "如画的", "example": "A picturesque village.", "core": "PICT (画)", "logic": "像画出来的（Picture-like）一样美。" },
+  { "word": "magnificent", "pos": "adj.", "chinese": "壮丽的", "example": "A magnificent view.", "core": "MAGN (大) + FIC (做)", "logic": "做得非常宏大（Magnify），气势磅礴。" }
 ]
