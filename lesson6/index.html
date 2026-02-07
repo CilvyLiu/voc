@@ -31,13 +31,13 @@
             height: 80px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .nature-hub.collapsed { height: 0; padding: 0 20px; border-bottom: none; }
+        .nature-hub.collapsed { height: 0; padding: 0 20px; border-bottom: none; overflow: hidden; }
         .monitor-group { display: flex; align-items: center; gap: 25px; flex-grow: 1; min-width: 0; }
 
         #core-display {
             font-size: clamp(18px, 4vw, 28px); font-weight: 900; color: var(--core-hex);
             text-shadow: 0 0 15px rgba(197, 179, 88, 0.3);
-            min-width: 130px; text-transform: uppercase;
+            min-width: 130px; text-transform: uppercase; transition: transform 0.2s;
         }
 
         .logic-view { border-left: 1px solid rgba(197, 179, 88, 0.3); padding-left: 20px; min-width: 0; }
@@ -87,26 +87,39 @@
         const openBtn = document.getElementById('open-btn');
         const container = document.getElementById('container');
 
-        // --- 核心发音补丁：点击解锁 ---
-        let voiceUnlocked = false;
-        function unlockVoice() {
-            if (voiceUnlocked) return;
-            const silent = new SpeechSynthesisUtterance("");
-            window.speechSynthesis.speak(silent);
-            voiceUnlocked = true;
-            document.removeEventListener('touchstart', unlockVoice);
+        // 针对全平台的音频唤醒（尤其是 iOS）
+        function preheatAudio() {
+            const dummy = new Audio();
+            dummy.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA== ";
+            dummy.play().catch(()=>{});
+            document.removeEventListener('touchstart', preheatAudio);
         }
-        document.addEventListener('touchstart', unlockVoice);
+        document.addEventListener('touchstart', preheatAudio);
 
         function setPanel(show) {
             if(show) { hub.classList.remove('collapsed'); openBtn.style.display = 'none'; }
             else { hub.classList.add('collapsed'); openBtn.style.display = 'block'; }
         }
 
+        // 标准英音播放逻辑（安卓苹果双兼容）
+        function playUKEnglish(text) {
+            // type=2: 标准英音 (RP English)
+            const audioUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+            const audio = new Audio(audioUrl);
+            
+            audio.play().catch(e => {
+                // 兜底方案：系统本地 TTS
+                window.speechSynthesis.cancel();
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.lang = 'en-GB'; 
+                speech.rate = 0.85;
+                window.speechSynthesis.speak(speech);
+            });
+        }
+
         function activate(item, el) {
             if(hub.classList.contains('collapsed')) setPanel(true);
             
-            // 1. 视觉更新
             coreEl.innerText = item.core;
             logicEl.innerText = "📜 " + item.logic;
             coreEl.style.transform = "scale(1.1)";
@@ -115,20 +128,8 @@
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
         
-            // 2. 核心语音修复：切换到云端真人音轨
-            // type=1: 美音 (American), type=2: 英音 (British - 更符合文明史主题)
-            const audioUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(item.word)}&type=2`;
-            
-            const audio = new Audio(audioUrl);
-    audio.play().catch(e => {
-        // 如果云端接口被拦截，再切回本地 TTS 救急
-        window.speechSynthesis.cancel();
-        const speech = new SpeechSynthesisUtterance(item.word);
-        speech.lang = 'en-US';
-        speech.rate = 0.8;
-        window.speechSynthesis.speak(speech);
-    });
-}
+            playUKEnglish(item.word);
+        }
 
         fetch('data.json')
             .then(res => res.json())
