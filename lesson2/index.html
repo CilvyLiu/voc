@@ -6,82 +6,123 @@
     <title>L2: Education | Nova's Lab</title>
     <style>
         :root { --core-hex: #3498db; --accent: #2ecc71; --bg: #0f172a; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
         
-        /* 全息监控中心 */
+        /* 呼出按钮 (初始隐藏) */
+        .panel-trigger {
+            position: fixed; top: 10px; right: 20px; z-index: 1001;
+            padding: 6px 15px; background: var(--core-hex); color: white;
+            border-radius: 5px; font-size: 12px; cursor: pointer; display: none;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.5); font-weight: bold;
+        }
+
+        /* 改造后的全息监控中心：横向布局 */
         .reactor-container {
-            position: sticky; top: 10px; z-index: 1000;
+            position: sticky; top: 0; z-index: 1000;
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(15px);
-            border: 2px solid var(--core-hex);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 40px;
-            text-align: center;
-            box-shadow: 0 0 40px rgba(52, 152, 219, 0.3);
+            border-bottom: 2px solid var(--core-hex);
+            padding: 15px 30px;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 90px;
         }
+
+        /* 折叠效果 */
+        .reactor-container.collapsed {
+            height: 0; padding: 0 30px; border-bottom: none; overflow: hidden;
+        }
+
+        .display-group { display: flex; align-items: center; gap: 40px; flex-grow: 1; }
 
         #core-display {
-            font-size: 48px; font-weight: 900; color: var(--core-hex);
-            text-shadow: 0 0 25px var(--core-hex);
-            margin: 10px 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 36px; font-weight: 900; color: var(--core-hex);
+            text-shadow: 0 0 20px var(--core-hex);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 140px;
         }
 
-        #logic-display { font-size: 18px; color: var(--accent); min-height: 1.5em; font-weight: 500; }
+        .logic-panel { text-align: left; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 30px; }
+        .logic-header { font-size: 10px; letter-spacing: 3px; opacity: 0.5; margin-bottom: 5px; }
+        #logic-display { font-size: 18px; color: var(--accent); font-weight: 500; }
+
+        .ui-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
+            color: white; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;
+            transition: 0.2s;
+        }
+        .ui-btn:hover { background: #ff4757; border-color: #ff4757; }
 
         /* 单词卡片排列 */
-        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 25px; }
         .card {
             background: #1e293b; border-radius: 12px; padding: 20px;
             cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
             display: flex; flex-direction: column;
         }
-        .card:hover { border-color: var(--core-hex); transform: translateY(-5px); background: #334155; }
-        .card.active { border-color: var(--accent); background: #334155; box-shadow: 0 0 15px var(--accent); }
+        .card:hover { border-color: var(--core-hex); transform: translateY(-5px); background: #26334d; }
+        .card.active { border-color: var(--accent); background: #26334d; box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); }
 
         .word-text { font-size: 22px; font-weight: bold; color: var(--core-hex); }
         .pos-tag { font-size: 11px; color: #94a3b8; margin-left: 8px; font-style: italic; }
-        .meaning { margin: 8px 0; font-size: 16px; font-weight: bold; }
+        .meaning { margin: 8px 0; font-size: 16px; font-weight: bold; color: #e2e8f0; }
         .example-txt { font-size: 13px; color: #94a3b8; line-height: 1.4; flex-grow: 1; }
     </style>
 </head>
 <body>
 
-    <div class="reactor-container">
-        <div style="font-size: 11px; letter-spacing: 3px; opacity: 0.5;">CORE LOGIC DECODER</div>
-        <div id="core-display">READY...</div>
-        <div id="logic-display">点击单词启动核心逻辑解码</div>
-    </div>
+    <div class="panel-trigger" id="open-btn" onclick="togglePanel(true)">SHOW LAB</div>
 
-    
+    <div class="reactor-container" id="hub">
+        <div class="display-group">
+            <div id="core-display">READY</div>
+            <div class="logic-panel">
+                <div class="logic-header">CORE LOGIC DECODER</div>
+                <div id="logic-display">选择样本以解析底层逻辑...</div>
+            </div>
+        </div>
+        <button class="ui-btn" onclick="togglePanel(false)">CLOSE</button>
+    </div>
 
     <div class="vocab-grid" id="container"></div>
 
     <script>
         const coreEl = document.getElementById('core-display');
         const logicEl = document.getElementById('logic-display');
+        const hub = document.getElementById('hub');
+        const openBtn = document.getElementById('open-btn');
+
+        function togglePanel(show) {
+            if (show) {
+                hub.classList.remove('collapsed');
+                openBtn.style.display = 'none';
+            } else {
+                hub.classList.add('collapsed');
+                openBtn.style.display = 'block';
+            }
+        }
 
         function activateWord(item, element) {
-            // 核心交互：更新上方监控器
+            // 自动唤醒面板
+            if(hub.classList.contains('collapsed')) togglePanel(true);
+
             coreEl.innerText = item.core;
             logicEl.innerText = "⚛️ " + item.logic;
             
-            // 缩放震动反馈
             coreEl.style.transform = "scale(1.2)";
             setTimeout(() => coreEl.style.transform = "scale(1)", 200);
 
-            // 卡片高亮切换
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
 
-            // 语音播放
+            // 语音播放 (防堆叠处理)
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(item.word);
             utterance.lang = 'en-US';
             utterance.rate = 0.9;
             window.speechSynthesis.speak(utterance);
         }
 
-        // 加载数据并生成页面
         fetch('data.json')
             .then(res => res.json())
             .then(data => {
@@ -99,7 +140,7 @@
                 });
             })
             .catch(err => {
-                logicEl.innerText = "❌ 数据加载失败，请检查 data.json 格式";
+                logicEl.innerText = "❌ 数据加载失败，请检查目录";
             });
     </script>
 </body>
