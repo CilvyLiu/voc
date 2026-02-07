@@ -2,15 +2,16 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nova's Vocab Quiz | 全课次通用</title>
     <style>
         :root { --accent: #2ed573; --bg: #0d1117; --card: #161b22; --text: #e6edf3; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 0; }
         
         /* 选择界面 */
         #setup-screen { margin-top: 50px; text-align: center; width: 90%; max-width: 500px; }
         .lesson-select { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
-        .lesson-btn { background: var(--card); border: 1px solid #30363d; color: var(--text); padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .lesson-btn { background: var(--card); border: 1px solid #30363d; color: var(--text); padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .lesson-btn:hover { border-color: var(--accent); background: #21262d; }
         .lesson-btn.active { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(46, 213, 115, 0.2); }
 
@@ -19,12 +20,13 @@
         .progress-bar { width: 100%; height: 4px; background: #30363d; border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
         #progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.3s; }
         
-        .logic-hint { font-size: 1.3em; color: var(--accent); margin-bottom: 30px; min-height: 80px; padding: 20px; background: rgba(46, 213, 115, 0.05); border-radius: 12px; }
+        .logic-hint { font-size: 1.3em; color: var(--accent); margin-bottom: 30px; min-height: 80px; padding: 20px; background: rgba(46, 213, 115, 0.05); border-radius: 12px; border: 1px dashed rgba(46, 213, 115, 0.2); }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         button.option { 
             background: var(--card); border: 1px solid #30363d; color: var(--text); padding: 20px; 
             border-radius: 12px; cursor: pointer; font-size: 1.1em; transition: 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
         button.option:hover { transform: translateY(-2px); border-color: var(--accent); }
         button.correct { background: var(--accent) !important; color: #000 !important; font-weight: bold; border-color: var(--accent); }
@@ -32,15 +34,16 @@
 
         /* 评分显示 */
         #score-board { display: none; text-align: center; margin-top: 50px; }
-        .rank-circle { width: 120px; height: 120px; border-radius: 50%; border: 6px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 3em; margin: 20px auto; font-weight: bold; color: var(--accent); }
+        .rank-circle { width: 120px; height: 120px; border-radius: 50%; border: 6px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 3em; margin: 20px auto; font-weight: bold; color: var(--accent); animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
         .btn-main { background: var(--accent); color: #000; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <div id="setup-screen">
-        <h1>🧪 选择实验课次</h1>
-        <p>请选择要进行全息测验的模块：</p>
+        <h1>🧪 Nova's Holographic Quiz</h1>
+        <p>请选择全息测验模块以开始数据同步：</p>
         <div class="lesson-select">
             <button class="lesson-btn" onclick="startQuiz(1)">L1: Survival</button>
             <button class="lesson-btn" onclick="startQuiz(2)">L2: Education</button>
@@ -56,7 +59,7 @@
     <div id="game-box">
         <div class="progress-bar"><div id="progress-fill"></div></div>
         <div id="quest-area">
-            <div class="logic-hint" id="hint">加载数据中...</div>
+            <div class="logic-hint" id="hint">同步卫星链中...</div>
             <div class="options-grid" id="options"></div>
         </div>
 
@@ -74,18 +77,40 @@
     let currentIndex = 0;
     let score = 0;
 
+    // --- 音频解锁补丁 ---
+    function preheatAudio() {
+        const dummy = new Audio();
+        dummy.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA== ";
+        dummy.play().catch(()=>{});
+        document.removeEventListener('touchstart', preheatAudio);
+    }
+    document.addEventListener('touchstart', preheatAudio);
+
+    // 标准英音播放核心逻辑 (type=2)
+    function playUKEnglish(text) {
+        const audioUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+        const audio = new Audio(audioUrl);
+        audio.play().catch(() => {
+            window.speechSynthesis.cancel();
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-GB';
+            speech.rate = 0.9;
+            window.speechSynthesis.speak(speech);
+        });
+    }
+
     async function startQuiz(lessonNum) {
         document.getElementById('setup-screen').style.display = 'none';
         document.getElementById('game-box').style.display = 'block';
         
         try {
-            // 动态路径：自动去对应文件夹下找 data.json
             const response = await fetch(`./lesson${lessonNum}/data.json`);
+            if (!response.ok) throw new Error();
             const data = await response.json();
             vocabulary = data.sort(() => Math.random() - 0.5);
             showQuestion();
         } catch (error) {
-            alert(`无法加载 Lesson ${lessonNum} 的数据，请检查路径。`);
+            alert(`无法连接到 Lesson ${lessonNum} 的数据库，请确认路径正确。`);
             location.reload();
         }
     }
@@ -98,7 +123,7 @@
 
         const current = vocabulary[currentIndex];
         document.getElementById('progress-fill').style.width = (currentIndex / vocabulary.length) * 100 + "%";
-        document.getElementById('hint').innerHTML = `<small style="opacity:0.6">逻辑线索：</small><br>${current.logic}`;
+        document.getElementById('hint').innerHTML = `<small style="opacity:0.6; font-size: 12px; letter-spacing: 1px;">ANALYTIC LOGIC:</small><br>${current.logic}`;
 
         let choices = [current.word];
         while (choices.length < 4) {
@@ -125,9 +150,7 @@
         if (selected === correct) {
             btn.classList.add('correct');
             score++;
-            const speech = new SpeechSynthesisUtterance(correct);
-            speech.lang = 'en-US';
-            window.speechSynthesis.speak(speech);
+            playUKEnglish(correct); // 正确时触发标准英音
         } else {
             btn.classList.add('wrong');
             btns.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
@@ -136,14 +159,14 @@
         setTimeout(() => {
             currentIndex++;
             showQuestion();
-        }, 1000);
+        }, 1200); // 稍微延长等待，让 Nova 听清发音
     }
 
     function showResult() {
         document.getElementById('quest-area').style.display = 'none';
         document.getElementById('score-board').style.display = 'block';
         const percent = Math.round((score / vocabulary.length) * 100);
-        document.getElementById('accuracy').innerText = `最终成绩: ${score} / ${vocabulary.length} (${percent}%)`;
+        document.getElementById('accuracy').innerText = `同步完成度: ${score} / ${vocabulary.length} (${percent}%)`;
         
         let rank = 'C';
         if (percent >= 95) rank = 'S';
