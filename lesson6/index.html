@@ -2,13 +2,16 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>L6: Civilization Lab | Nova's Lab</title>
     <style>
         :root { 
             --core-hex: #C5B358; --accent: #E2725B; --bg: #1C1C1C; --card-bg: #2A2A2A; 
         }
-        body { font-family: 'Georgia', serif; background: var(--bg); color: #fdfdfd; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Georgia', serif; background: var(--bg); color: #fdfdfd; margin: 0; padding: 0; 
+            -webkit-tap-highlight-color: transparent;
+        }
         
         .trigger-btn {
             position: fixed; top: 15px; right: 20px; z-index: 1001;
@@ -49,12 +52,12 @@
             background: var(--card-bg); border-radius: 8px; padding: 18px;
             cursor: pointer; border: 1px solid rgba(197, 179, 88, 0.1); transition: 0.2s;
         }
-        .card:hover { border-color: var(--core-hex); transform: scale(1.02); background: #333; }
+        .card:hover { border-color: var(--core-hex); transform: translateY(-3px); background: #333; }
         .card.active { border-color: var(--accent); background: #3d3424; box-shadow: 0 0 15px rgba(226, 114, 91, 0.1); }
 
         .word-box { display: flex; justify-content: space-between; align-items: baseline; }
         .word-txt { font-size: 19px; font-weight: bold; color: var(--core-hex); }
-        .phonetic { font-size: 12px; color: #888; font-family: sans-serif; margin-left: 5px; }
+        .phonetic { font-size: 12px; color: #888; font-family: 'Segoe UI', sans-serif; margin-left: 8px; font-weight: normal; }
         .pos-txt { font-size: 11px; color: var(--accent); font-style: italic; }
         .mean-txt { margin: 6px 0; font-size: 15px; font-weight: bold; color: #eee; }
         .exam-txt { font-size: 12.5px; color: #aaa; line-height: 1.4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; }
@@ -75,7 +78,7 @@
         <button class="ui-close" onclick="setPanel(false)">CLOSE</button>
     </div>
 
-    <div class="vocab-grid" id="container">正在出土数据...</div>
+    <div class="vocab-grid" id="container">正在出土历史数据...</div>
 
     <script>
         const coreEl = document.getElementById('core-display');
@@ -84,6 +87,17 @@
         const openBtn = document.getElementById('open-btn');
         const container = document.getElementById('container');
 
+        // --- 核心发音补丁：点击解锁 ---
+        let voiceUnlocked = false;
+        function unlockVoice() {
+            if (voiceUnlocked) return;
+            const silent = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(silent);
+            voiceUnlocked = true;
+            document.removeEventListener('touchstart', unlockVoice);
+        }
+        document.addEventListener('touchstart', unlockVoice);
+
         function setPanel(show) {
             if(show) { hub.classList.remove('collapsed'); openBtn.style.display = 'none'; }
             else { hub.classList.add('collapsed'); openBtn.style.display = 'block'; }
@@ -91,13 +105,23 @@
 
         function activate(item, el) {
             if(hub.classList.contains('collapsed')) setPanel(true);
+            
+            // 文本同步
             coreEl.innerText = item.core;
             logicEl.innerText = "📜 " + item.logic;
+            
+            // 动画反馈
+            coreEl.style.transform = "scale(1.1)";
+            setTimeout(() => coreEl.style.transform = "scale(1)", 200);
+
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
+
+            // 执行发音
             window.speechSynthesis.cancel();
             const speech = new SpeechSynthesisUtterance(item.word);
             speech.lang = 'en-US';
+            speech.rate = 0.85; // 稍微放慢一点，符合“历史研究”的优雅感
             window.speechSynthesis.speak(speech);
         }
 
@@ -111,7 +135,7 @@
                     card.onclick = () => activate(item, card);
                     card.innerHTML = `
                         <div class="word-box">
-                            <div><span class="word-txt">${item.word}</span><span class="phonetic">${item.ipa}</span></div>
+                            <div><span class="word-txt">${item.word}</span><span class="phonetic">${item.ipa || ''}</span></div>
                             <span class="pos-txt">${item.pos}</span>
                         </div>
                         <div class="mean-txt">${item.chinese}</div>
@@ -119,6 +143,11 @@
                     `;
                     container.appendChild(card);
                 });
+            })
+            .catch(err => {
+                container.innerHTML = `<div style="padding: 50px; text-align: center; color: var(--accent);">
+                    ❌ 编年史链路中断：请检查数据文件。
+                </div>`;
             });
     </script>
 </body>
