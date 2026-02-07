@@ -106,24 +106,29 @@
         function activate(item, el) {
             if(hub.classList.contains('collapsed')) setPanel(true);
             
-            // 文本同步
+            // 1. 视觉更新
             coreEl.innerText = item.core;
             logicEl.innerText = "📜 " + item.logic;
-            
-            // 动画反馈
             coreEl.style.transform = "scale(1.1)";
             setTimeout(() => coreEl.style.transform = "scale(1)", 200);
-
+        
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-
-            // 执行发音
-            window.speechSynthesis.cancel();
-            const speech = new SpeechSynthesisUtterance(item.word);
-            speech.lang = 'en-US';
-            speech.rate = 0.85; // 稍微放慢一点，符合“历史研究”的优雅感
-            window.speechSynthesis.speak(speech);
-        }
+        
+            // 2. 核心语音修复：切换到云端真人音轨
+            // type=1: 美音 (American), type=2: 英音 (British - 更符合文明史主题)
+            const audioUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(item.word)}&type=2`;
+            
+            const audio = new Audio(audioUrl);
+    audio.play().catch(e => {
+        // 如果云端接口被拦截，再切回本地 TTS 救急
+        window.speechSynthesis.cancel();
+        const speech = new SpeechSynthesisUtterance(item.word);
+        speech.lang = 'en-US';
+        speech.rate = 0.8;
+        window.speechSynthesis.speak(speech);
+    });
+}
 
         fetch('data.json')
             .then(res => res.json())
