@@ -2,13 +2,16 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>L2: Education | Nova's Lab</title>
     <style>
         :root { --core-hex: #3498db; --accent: #2ecc71; --bg: #0f172a; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
         
-        /* 呼出按钮 (初始隐藏) */
+        /* 呼出按钮 */
         .panel-trigger {
             position: fixed; top: 10px; right: 20px; z-index: 1001;
             padding: 6px 15px; background: var(--core-hex); color: white;
@@ -16,7 +19,7 @@
             box-shadow: 0 0 15px rgba(52, 152, 219, 0.5); font-weight: bold;
         }
 
-        /* 改造后的全息监控中心：横向布局 */
+        /* 改造后的全息监控中心 */
         .reactor-container {
             position: sticky; top: 0; z-index: 1000;
             background: rgba(15, 23, 42, 0.95);
@@ -28,10 +31,7 @@
             height: 90px;
         }
 
-        /* 折叠效果 */
-        .reactor-container.collapsed {
-            height: 0; padding: 0 30px; border-bottom: none; overflow: hidden;
-        }
+        .reactor-container.collapsed { height: 0; padding: 0 30px; border-bottom: none; overflow: hidden; }
 
         .display-group { display: flex; align-items: center; gap: 40px; flex-grow: 1; }
 
@@ -53,12 +53,13 @@
         }
         .ui-btn:hover { background: #ff4757; border-color: #ff4757; }
 
-        /* 单词卡片排列 */
+        /* 单词卡片 */
         .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 25px; }
         .card {
             background: #1e293b; border-radius: 12px; padding: 20px;
             cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
             display: flex; flex-direction: column;
+            position: relative;
         }
         .card:hover { border-color: var(--core-hex); transform: translateY(-5px); background: #26334d; }
         .card.active { border-color: var(--accent); background: #26334d; box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); }
@@ -78,7 +79,7 @@
             <div id="core-display">READY</div>
             <div class="logic-panel">
                 <div class="logic-header">CORE LOGIC DECODER</div>
-                <div id="logic-display">选择样本以解析底层逻辑...</div>
+                <div id="logic-display">实验室就绪，点单词激活声音...</div>
             </div>
         </div>
         <button class="ui-btn" onclick="togglePanel(false)">CLOSE</button>
@@ -92,6 +93,42 @@
         const hub = document.getElementById('hub');
         const openBtn = document.getElementById('open-btn');
 
+        // --- 核心全栈音频引擎 ---
+        let audioUnlocked = false;
+
+        function unlockAudio() {
+            if (audioUnlocked) return;
+            // 预加载一个静音片段，强行打开 iOS/安卓的音频通道
+            const silent = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==");
+            silent.play().then(() => {
+                audioUnlocked = true;
+                logicEl.innerText = "✅ 音频通道已激活";
+                console.log("Audio Unlocked");
+            }).catch(() => {});
+            
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('touchstart', unlockAudio);
+        }
+
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio, {passive: true});
+
+        function speak(text) {
+            // 1. 先让系统 TTS 静默，防止电脑重音
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+
+            // 2. 统一使用云端 API，兼容性最高
+            const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+            const audio = new Audio(url);
+            audio.play().catch(e => {
+                console.warn("播放受阻，请检查静音键:", e);
+                logicEl.innerText = "⚠️ 播放受阻，请检查静音键";
+            });
+        }
+
+        // --- UI 控制逻辑 ---
         function togglePanel(show) {
             if (show) {
                 hub.classList.remove('collapsed');
@@ -103,7 +140,6 @@
         }
 
         function activateWord(item, element) {
-            // 自动唤醒面板
             if(hub.classList.contains('collapsed')) togglePanel(true);
 
             coreEl.innerText = item.core;
@@ -115,14 +151,11 @@
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
 
-            // 语音播放 (防堆叠处理)
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(item.word);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.9;
-            window.speechSynthesis.speak(utterance);
+            // 调用优化后的发音
+            speak(item.word);
         }
 
+        // --- 加载数据 ---
         fetch('data.json')
             .then(res => res.json())
             .then(data => {
