@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L1: Survival | Nova's Vocab Lab</title>
+    <style>
+        :root { --core: #ff4757; --edge: #1e90ff; --bg: #f1f2f6; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); padding: 20px; }
+        .back-btn { text-decoration: none; color: var(--edge); font-weight: bold; }
+        header { text-align: center; margin: 30px 0; }
+        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--core); transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .word-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .word { font-size: 22px; font-weight: bold; color: var(--core); }
+        .pos { font-style: italic; color: #747d8c; font-size: 14px; }
+        .btn-audio { cursor: pointer; border: none; background: #e7f3ff; border-radius: 50%; width: 35px; height: 35px; color: var(--edge); }
+        .meaning { font-weight: bold; margin-bottom: 10px; display: block; }
+        .example { font-size: 14px; color: #57606f; background: #f9f9f9; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .logic-box { font-size: 13px; border-top: 1px dashed #ddd; padding-top: 10px; color: #2f3542; }
+        .core-tag { color: var(--core); font-weight: bold; }
+    </style>
+</head>
+<body>
+    <a href="../index.html" class="back-btn">← 返回实验室主页</a>
+    <header>
+        <h1>✈️ L1: Survival & Travel</h1>
+        <p>核心词根词缀分析与母语感建立</p>
+    </header>
+
+    <div class="vocab-grid" id="vocab-container">
+        </div>
+
+    <script>
+        // TTS 朗读功能
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+
+        // 读取 JSON 数据
+        fetch('data.json')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('vocab-container');
+                data.forEach(item => {
+                    container.innerHTML += `
+                        <div class="card">
+                            <div class="word-row">
+                                <span class="word">${item.word}</span>
+                                <button class="btn-audio" onclick="speak('${item.word}')">🔊</button>
+                            </div>
+                            <span class="pos">${item.pos}</span>
+                            <span class="meaning">${item.chinese}</span>
+                            <div class="example">${item.example}</div>
+                            <div class="logic-box">
+                                <span class="core-tag">⚛️ Core:</span> ${item.core}<br>
+                                💡 ${item.logic}
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+    </script>
+</body>
+</html>
