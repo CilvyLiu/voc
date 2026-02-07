@@ -5,35 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>L1: Survival | Nova's Vocab Lab</title>
     <style>
-        :root { --core: #ff4757; --edge: #1e90ff; --bg: #f1f2f6; }
-        body { font-family: system-ui, sans-serif; background: var(--bg); padding: 20px; }
+        :root { 
+            --core: #ff4757; 
+            --edge: #1e90ff; 
+            --bg: #0f172a; /* 改为深色背景，更有科技感 */
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+        
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; padding: 20px; line-height: 1.6; }
         .back-btn { text-decoration: none; color: var(--edge); font-weight: bold; }
-        header { text-align: center; margin: 30px 0; }
-        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--core); transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); }
-        .word-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .word { font-size: 22px; font-weight: bold; color: var(--core); }
-        .pos { font-style: italic; color: #747d8c; font-size: 14px; }
-        .btn-audio { cursor: pointer; border: none; background: #e7f3ff; border-radius: 50%; width: 35px; height: 35px; color: var(--edge); }
-        .meaning { font-weight: bold; margin-bottom: 10px; display: block; }
-        .example { font-size: 14px; color: #57606f; background: #f9f9f9; padding: 10px; border-radius: 5px; margin: 10px 0; }
-        .logic-box { font-size: 13px; border-top: 1px dashed #ddd; padding-top: 10px; color: #2f3542; }
-        .core-tag { color: var(--core); font-weight: bold; }
+        
+        header { text-align: center; margin: 20px 0; }
+
+        /* --- 核心视觉组件：原子逻辑展示区 --- */
+        .visual-lab-hub {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            background: radial-gradient(circle, rgba(255,71,87,0.1) 0%, rgba(15,23,42,1) 70%);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .core-visual {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            background: var(--core);
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 0 30px var(--core);
+            z-index: 2;
+        }
+
+        /* 模拟轨道动画 */
+        .orbit {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 240px; height: 240px;
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate { from {transform: translate(-50%, -50%) rotate(0deg);} to {transform: translate(-50%, -50%) rotate(360deg);} }
+
+        /* --- 单词列表布局 --- */
+        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        
+        .card { 
+            background: var(--card-bg); 
+            color: #2f3542;
+            border-radius: 16px; 
+            padding: 24px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+            border-top: 5px solid var(--core); 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card:hover { transform: translateY(-10px) scale(1.02); }
+
+        .word-row { display: flex; justify-content: space-between; align-items: center; }
+        .word { font-size: 26px; font-weight: 800; color: var(--core); letter-spacing: -0.5px; }
+        
+        .btn-audio { cursor: pointer; border: none; background: #f0f2f5; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; transition: 0.2s; }
+        .btn-audio:hover { background: var(--edge); color: white; }
+
+        .logic-box { 
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(30, 144, 255, 0.05);
+            border-radius: 8px;
+            font-size: 13.5px;
+            border-left: 3px solid var(--edge);
+        }
+        
+        .core-tag { color: var(--core); font-weight: bold; text-transform: uppercase; font-size: 12px; }
     </style>
 </head>
 <body>
-    <a href="../index.html" class="back-btn">← 返回实验室主页</a>
+    <a href="../index.html" class="back-btn">← LAB PORTAL</a>
+    
     <header>
-        <h1>✈️ L1: Survival & Travel</h1>
-        <p>核心词根词缀分析与母语感建立</p>
+        <h1>✈️ L1: SURVIVAL ANALYTICS</h1>
+        <p>正在观察词汇在空间位移中的能量坍缩与重构</p>
     </header>
 
-    <div class="vocab-grid" id="vocab-container">
+    <div class="visual-lab-hub">
+        <div style="position: relative; height: 260px; display: flex; align-items: center; justify-content: center;">
+            <div class="orbit"></div>
+            <div class="core-visual">ROOT</div>
+            <div style="position: absolute; color: var(--edge); top: 10%; font-weight: bold;">[ EDGE: SCENARIOS ]</div>
         </div>
+        <p style="font-style: italic; opacity: 0.7;">点击下方单词查看其如何从 Core 发散至 Edge</p>
+    </div>
+
+    <div class="vocab-grid" id="vocab-container"></div>
 
     <script>
-        // TTS 朗读功能
         function speak(text) {
             const msg = new SpeechSynthesisUtterance(text);
             msg.lang = 'en-US';
@@ -41,7 +117,6 @@
             window.speechSynthesis.speak(msg);
         }
 
-        // 读取 JSON 数据
         fetch('data.json')
             .then(res => res.json())
             .then(data => {
@@ -53,12 +128,16 @@
                                 <span class="word">${item.word}</span>
                                 <button class="btn-audio" onclick="speak('${item.word}')">🔊</button>
                             </div>
-                            <span class="pos">${item.pos}</span>
-                            <span class="meaning">${item.chinese}</span>
-                            <div class="example">${item.example}</div>
+                            <div style="margin: 5px 0 15px 0;">
+                                <span style="font-size: 12px; background: #eee; padding: 2px 6px; border-radius: 4px;">${item.pos}</span>
+                                <span style="font-weight: bold; margin-left: 8px;">${item.chinese}</span>
+                            </div>
+                            <div style="font-size: 14px; color: #57606f; line-height: 1.4; margin-bottom: 15px;">
+                                ${item.example}
+                            </div>
                             <div class="logic-box">
-                                <span class="core-tag">⚛️ Core:</span> ${item.core}<br>
-                                💡 ${item.logic}
+                                <div class="core-tag">⚛️ Core Logic: ${item.core}</div>
+                                <div style="margin-top: 5px;">💡 ${item.logic}</div>
                             </div>
                         </div>
                     `;
