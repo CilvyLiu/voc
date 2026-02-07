@@ -31,8 +31,7 @@
             height: 90px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .nature-hub.collapsed { height: 0; padding: 0 20px; border-bottom: none; }
-
+        .nature-hub.collapsed { height: 0; padding: 0 20px; border-bottom: none; overflow: hidden; }
         .monitor-group { display: flex; align-items: center; gap: 25px; flex-grow: 1; min-width: 0; }
 
         #core-display {
@@ -44,7 +43,6 @@
 
         .logic-view { border-left: 1px solid rgba(155, 89, 182, 0.3); padding-left: 20px; min-width: 0; flex-grow: 1; }
         
-        /* 搜索框样式 */
         #search-box {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(155, 89, 182, 0.3);
             color: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: 12px;
@@ -100,6 +98,15 @@
         const container = document.getElementById('container');
         let rawData = [];
 
+        // iOS 唤醒补丁
+        function preheatAudio() {
+            const dummy = new Audio();
+            dummy.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA== ";
+            dummy.play().catch(()=>{});
+            document.removeEventListener('touchstart', preheatAudio);
+        }
+        document.addEventListener('touchstart', preheatAudio);
+
         function setPanel(show) {
             if(show) { hub.classList.remove('collapsed'); openBtn.style.display = 'none'; }
             else { hub.classList.add('collapsed'); openBtn.style.display = 'block'; }
@@ -113,22 +120,36 @@
             renderCards(filtered);
         }
 
+        // 标准英音播放核心逻辑
+        function playUKEnglish(text) {
+            const audioUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+            const audio = new Audio(audioUrl);
+            
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // 降级方案
+                    window.speechSynthesis.cancel();
+                    const speech = new SpeechSynthesisUtterance(text);
+                    speech.lang = 'en-GB';
+                    speech.rate = 0.9;
+                    window.speechSynthesis.speak(speech);
+                });
+            }
+        }
+
         function activate(item, el) {
             if(hub.classList.contains('collapsed')) setPanel(true);
             coreEl.innerText = item.core;
             logicEl.innerText = "🌐 " + item.logic;
             
-            // 数字化脉冲动效
             coreEl.style.transform = "scale(1.2)";
             setTimeout(() => coreEl.style.transform = "scale(1)", 200);
 
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
 
-            window.speechSynthesis.cancel();
-            const speech = new SpeechSynthesisUtterance(item.word);
-            speech.lang = 'en-US';
-            window.speechSynthesis.speak(speech);
+            playUKEnglish(item.word);
         }
 
         function renderCards(data) {
