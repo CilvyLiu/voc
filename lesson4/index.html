@@ -2,13 +2,16 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>L4: Eco-Energy Lab | Nova's Lab</title>
     <style>
         :root { 
             --core-hex: #3498db; --accent: #1abc9c; --bg: #050f1a; --card-bg: #0d1b2a; 
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; 
+            -webkit-tap-highlight-color: transparent; /* 移除移动端点击蓝框 */
+        }
         
         .trigger-btn {
             position: fixed; top: 15px; right: 20px; z-index: 1001;
@@ -26,6 +29,7 @@
             padding: 10px 20px;
             display: flex; align-items: center; justify-content: space-between;
             height: 80px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
         .nature-hub.collapsed { height: 0; padding: 0 20px; border-bottom: none; }
@@ -33,17 +37,17 @@
         .monitor-group { display: flex; align-items: center; gap: 25px; flex-grow: 1; min-width: 0; }
 
         #core-display {
-            font-size: clamp(20px, 5vw, 32px); font-weight: 900; color: var(--core-hex);
+            font-size: clamp(18px, 4.5vw, 32px); font-weight: 900; color: var(--core-hex);
             text-shadow: 0 0 20px rgba(52, 152, 219, 0.6);
             min-width: 110px; text-transform: uppercase;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .logic-view { border-left: 1px solid rgba(52, 152, 219, 0.3); padding-left: 20px; min-width: 0; }
         .logic-tag { font-size: 9px; color: var(--accent); letter-spacing: 2px; margin-bottom: 2px; }
         #logic-text { font-size: 15px; color: #ecf0f1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .ui-close { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 10px; }
+        .ui-close { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 10px; flex-shrink: 0; }
 
         /* 响应式卡片网格 */
         .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 25px; }
@@ -80,14 +84,14 @@
             <div id="core-display">POWER ON</div>
             <div class="logic-view">
                 <div class="logic-tag">ENERGY & ECO LOGIC TERMINAL</div>
-                <div id="logic-text">系统就绪，请选择环保词项进行逻辑解码...</div>
+                <div id="logic-text">系统就绪，请选择样本...</div>
             </div>
         </div>
         <button class="ui-close" onclick="setPanel(false)">CLOSE</button>
     </div>
 
     <div class="vocab-grid" id="container">
-        <div style="grid-column: 1/-1; text-align: center; opacity: 0.5; padding: 50px;">📡 正在加载能源实验室数据...</div>
+        <div style="grid-column: 1/-1; text-align: center; opacity: 0.5; padding: 50px;">📡 正在并网加载数据中心...</div>
     </div>
 
     <script>
@@ -97,9 +101,32 @@
         const openBtn = document.getElementById('open-btn');
         const container = document.getElementById('container');
 
+        // --- 核心修复：音频激活锁 ---
+        let audioUnlocked = false;
+        function unlockAudio() {
+            if (audioUnlocked) return;
+            // 播放静音片段激活移动端音频上下文
+            const msg = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(msg);
+            audioUnlocked = true;
+            console.log("Audio Context Unlocked");
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('touchstart', unlockAudio);
+        }
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio, {passive: true});
+
         function setPanel(show) {
             if(show) { hub.classList.remove('collapsed'); openBtn.style.display = 'none'; }
             else { hub.classList.add('collapsed'); openBtn.style.display = 'block'; }
+        }
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            speech.rate = 0.9;
+            window.speechSynthesis.speak(speech);
         }
 
         function activate(item, el) {
@@ -108,23 +135,23 @@
             coreEl.innerText = item.core;
             logicEl.innerText = "⚡ " + item.logic;
             
-            // 能量激增动效
+            // 增强动效：颜色切换 + 缩放跳动
             coreEl.style.color = "var(--accent)";
-            setTimeout(() => coreEl.style.color = "var(--core-hex)", 300);
+            coreEl.style.transform = "scale(1.1) rotate(-2deg)";
+            setTimeout(() => {
+                coreEl.style.color = "var(--core-hex)";
+                coreEl.style.transform = "scale(1) rotate(0deg)";
+            }, 250);
             
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
 
-            window.speechSynthesis.cancel();
-            const speech = new SpeechSynthesisUtterance(item.word);
-            speech.lang = 'en-US';
-            window.speechSynthesis.speak(speech);
+            speak(item.word);
         }
 
-        // 加载 Lesson 4 数据
         fetch('data.json')
             .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
+                if (!res.ok) throw new Error('Data linking failed');
                 return res.json();
             })
             .then(data => {
@@ -143,7 +170,7 @@
             })
             .catch(err => {
                 container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--accent); padding: 50px;">
-                    ❌ 链路中断：请检查 lesson4 目录下是否存在合法的 data.json
+                    ❌ 能源链路故障：请确认 data.json 位于 lesson 目录下。
                 </div>`;
             });
     </script>
