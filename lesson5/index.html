@@ -2,13 +2,16 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>L5: Digital Lab | Nova's Lab</title>
     <style>
         :root { 
             --core-hex: #9b59b6; --accent: #e84393; --bg: #0f0a1a; --card-bg: #1a1429; 
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
         
         .trigger-btn {
             position: fixed; top: 15px; right: 20px; z-index: 1001;
@@ -20,12 +23,12 @@
         /* 数字化监控中心 */
         .nature-hub {
             position: sticky; top: 0; z-index: 1000;
-            background: rgba(15, 10, 26, 0.95);
+            background: rgba(15, 10, 26, 0.9);
             backdrop-filter: blur(20px);
             border-bottom: 2px solid var(--core-hex);
             padding: 10px 20px;
             display: flex; align-items: center; justify-content: space-between;
-            height: 80px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 90px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nature-hub.collapsed { height: 0; padding: 0 20px; border-bottom: none; }
@@ -33,23 +36,35 @@
         .monitor-group { display: flex; align-items: center; gap: 25px; flex-grow: 1; min-width: 0; }
 
         #core-display {
-            font-size: clamp(20px, 5vw, 32px); font-weight: 900; color: var(--core-hex);
+            font-size: clamp(18px, 4.5vw, 28px); font-weight: 900; color: var(--core-hex);
             text-shadow: 0 0 20px rgba(155, 89, 182, 0.6);
             min-width: 120px; text-transform: uppercase;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .logic-view { border-left: 1px solid rgba(155, 89, 182, 0.3); padding-left: 20px; min-width: 0; }
-        .logic-tag { font-size: 9px; color: var(--accent); letter-spacing: 2px; margin-bottom: 2px; }
-        #logic-text { font-size: 15px; color: #ecf0f1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .logic-view { border-left: 1px solid rgba(155, 89, 182, 0.3); padding-left: 20px; min-width: 0; flex-grow: 1; }
+        
+        /* 搜索框样式 */
+        #search-box {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(155, 89, 182, 0.3);
+            color: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: 12px;
+            width: 150px; outline: none; transition: 0.3s;
+        }
+        #search-box:focus { border-color: var(--accent); width: 200px; background: rgba(255,255,255,0.1); }
 
-        .ui-close { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 10px; }
+        #logic-text { font-size: 14px; color: #ecf0f1; font-weight: 500; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .ui-close { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 10px; flex-shrink: 0; }
 
         .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 25px; }
         
         .card {
             background: var(--card-bg); border-radius: 10px; padding: 18px;
             cursor: pointer; border: 1px solid rgba(155, 89, 182, 0.1); transition: 0.2s;
+            animation: fadeIn 0.4s ease forwards;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         .card:hover { border-color: var(--core-hex); transform: translateY(-3px); background: #251b3a; }
         .card.active { border-color: var(--accent); background: #2d1f4d; box-shadow: 0 0 15px rgba(232, 67, 147, 0.2); }
 
@@ -68,14 +83,14 @@
         <div class="monitor-group">
             <div id="core-display">LINK START</div>
             <div class="logic-view">
-                <div class="logic-tag">DIGITAL & MOBILITY LOGIC DECODER</div>
-                <div id="logic-text">正在扫描设备与指令...</div>
+                <input type="text" id="search-box" placeholder="🔍 数据搜索..." oninput="filterData(this.value)">
+                <div id="logic-text">正在扫描数字化指令系统...</div>
             </div>
         </div>
         <button class="ui-close" onclick="setPanel(false)">CLOSE</button>
     </div>
 
-    <div class="vocab-grid" id="container">加载中...</div>
+    <div class="vocab-grid" id="container">📡 同步中...</div>
 
     <script>
         const coreEl = document.getElementById('core-display');
@@ -83,39 +98,62 @@
         const hub = document.getElementById('hub');
         const openBtn = document.getElementById('open-btn');
         const container = document.getElementById('container');
+        let rawData = [];
 
         function setPanel(show) {
             if(show) { hub.classList.remove('collapsed'); openBtn.style.display = 'none'; }
             else { hub.classList.add('collapsed'); openBtn.style.display = 'block'; }
         }
 
+        function filterData(query) {
+            const filtered = rawData.filter(item => 
+                item.word.toLowerCase().includes(query.toLowerCase()) || 
+                item.chinese.includes(query)
+            );
+            renderCards(filtered);
+        }
+
         function activate(item, el) {
             if(hub.classList.contains('collapsed')) setPanel(true);
             coreEl.innerText = item.core;
             logicEl.innerText = "🌐 " + item.logic;
+            
+            // 数字化脉冲动效
+            coreEl.style.transform = "scale(1.2)";
+            setTimeout(() => coreEl.style.transform = "scale(1)", 200);
+
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
+
             window.speechSynthesis.cancel();
             const speech = new SpeechSynthesisUtterance(item.word);
             speech.lang = 'en-US';
             window.speechSynthesis.speak(speech);
         }
 
+        function renderCards(data) {
+            container.innerHTML = "";
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => activate(item, card);
+                card.innerHTML = `
+                    <div class="word-box"><span class="word-txt">${item.word}</span><span class="pos-txt">${item.pos}</span></div>
+                    <div class="mean-txt">${item.chinese}</div>
+                    <div class="exam-txt">${item.example}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         fetch('data.json')
             .then(res => res.json())
             .then(data => {
-                container.innerHTML = "";
-                data.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => activate(item, card);
-                    card.innerHTML = `
-                        <div class="word-box"><span class="word-txt">${item.word}</span><span class="pos-txt">${item.pos}</span></div>
-                        <div class="mean-txt">${item.chinese}</div>
-                        <div class="exam-txt">${item.example}</div>
-                    `;
-                    container.appendChild(card);
-                });
+                rawData = data;
+                renderCards(data);
+            })
+            .catch(err => {
+                container.innerHTML = "❌ 数据加载失败，请检查 data.json";
             });
     </script>
 </body>
