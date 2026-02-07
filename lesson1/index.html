@@ -56,7 +56,6 @@
             font-size: 10px; font-weight: bold; cursor: pointer; display: none;
         }
 
-        /* --- 单词矩阵 --- */
         .vocab-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -107,24 +106,15 @@
         const hub = document.getElementById('hub');
         const showBtn = document.getElementById('show-btn');
 
-        // --- 核心补丁：多模式音频激活 ---
         let audioUnlocked = false;
 
         function unlockAudio() {
             if (audioUnlocked) return;
-            
-            // 1. 激活原生合成器
-            const unlockMsg = new SpeechSynthesisUtterance("");
-            window.speechSynthesis.speak(unlockMsg);
-            
-            // 2. 激活音频上下文 (针对某些回退引擎)
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
             const context = new (window.AudioContext || window.webkitAudioContext)();
             context.resume();
-
             audioUnlocked = true;
-            console.log("全系统音频锁定解除");
             detailEl.innerText = "系统就绪。请选择单词开始扫描。";
-            
             document.removeEventListener('touchstart', unlockAudio);
             document.removeEventListener('click', unlockAudio);
         }
@@ -132,36 +122,41 @@
         document.addEventListener('touchstart', unlockAudio, {passive: true});
         document.addEventListener('click', unlockAudio);
 
-        // --- 核心补丁：双引擎朗读函数 ---
+        // --- 全栈修复的核心：设备判定与云端回退 ---
+        function playCloudAudio(text) {
+            console.log("正在使用有道云端音频引擎...");
+            const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+            const audio = new Audio(url);
+            audio.play().catch(e => console.error("云端引擎失败:", e));
+        }
+
         function speak(text) {
-            window.speechSynthesis.cancel(); // 停止当前所有任务
+            window.speechSynthesis.cancel(); 
 
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'en-US';
-            msg.rate = 0.9;
-            msg.volume = 1.0;
+            // 判定是否为安卓
+            const isAndroid = /Android/i.test(navigator.userAgent);
 
-            // 设置一个“超时检查”：如果 500ms 内原生系统没声音，自动切到云端引擎
-            let hasStarted = false;
-            const fallbackTimer = setTimeout(() => {
-                if (!hasStarted) {
-                    console.log("系统合成器卡死，切换云端接口...");
-                    const fallbackUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
-                    const audio = new Audio(fallbackUrl);
-                    audio.play().catch(e => console.error("全部音频通道失效:", e));
-                }
-            }, 500);
+            if (isAndroid) {
+                // 安卓直接走云端，彻底解决无声问题
+                playCloudAudio(text);
+            } else {
+                // PC/iOS 优先走原生，防止重音
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.lang = 'en-US';
+                msg.rate = 0.9;
+                
+                let hasStarted = false;
+                const fallbackTimer = setTimeout(() => {
+                    if (!hasStarted) playCloudAudio(text);
+                }, 500);
 
-            msg.onstart = () => {
-                hasStarted = true;
-                clearTimeout(fallbackTimer);
-            };
+                msg.onstart = () => {
+                    hasStarted = true;
+                    clearTimeout(fallbackTimer);
+                };
 
-            window.speechSynthesis.speak(msg);
-            
-            // iOS 必须手动唤醒
-            if (window.speechSynthesis.paused) {
-                window.speechSynthesis.resume();
+                window.speechSynthesis.speak(msg);
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
             }
         }
 
@@ -172,16 +167,12 @@
 
         function analyze(item, element) {
             if(hub.classList.contains('collapsed')) toggleHub();
-
             coreEl.innerText = item.core;
             detailEl.innerHTML = `<strong style="color:var(--edge)">${item.word.toUpperCase()}</strong>: ${item.logic}`;
-            
             coreEl.style.transform = "scale(1.2) rotate(360deg)";
             setTimeout(() => coreEl.style.transform = "scale(1) rotate(0deg)", 400);
-
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
-            
             speak(item.word);
         }
 
@@ -194,7 +185,6 @@
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.onclick = () => analyze(item, card);
-                    
                     card.innerHTML = `
                         <div class="word-row">
                             <span class="word">${item.word}</span>
