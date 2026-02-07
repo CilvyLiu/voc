@@ -3,116 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L2: Education | Nova's Vocab Lab</title>
+    <title>L2: Education | Nova's Lab</title>
     <style>
-        :root { --core-color: #3498db; --bg: #0a0e14; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; padding: 20px; }
+        :root { --core-hex: #3498db; --accent: #2ecc71; --bg: #0f172a; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; }
         
-        /* 交互式实验室中心 */
-        .lab-monitor {
-            max-width: 800px;
-            margin: 0 auto 40px;
-            padding: 40px;
-            background: rgba(52, 152, 219, 0.05);
-            border: 2px solid var(--core-color);
+        /* 全息监控中心 */
+        .reactor-container {
+            position: sticky; top: 10px; z-index: 1000;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--core-hex);
             border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
             text-align: center;
-            position: sticky; /* 吸顶，方便点击下方单词时观察 */
-            top: 20px;
-            z-index: 100;
-            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(52, 152, 219, 0.3);
         }
 
-        #active-root {
-            font-size: 48px;
-            font-weight: bold;
-            color: var(--core-color);
-            text-shadow: 0 0 20px var(--core-color);
-            transition: all 0.3s;
+        #core-display {
+            font-size: 48px; font-weight: 900; color: var(--core-hex);
+            text-shadow: 0 0 25px var(--core-hex);
+            margin: 10px 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        #active-logic {
-            margin-top: 15px;
-            font-size: 18px;
-            color: #2ecc71;
-            min-height: 1.5em;
-        }
+        #logic-display { font-size: 18px; color: var(--accent); min-height: 1.5em; font-weight: 500; }
 
-        /* 单词卡片样式 */
-        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .card { 
-            background: #1e272e; 
-            padding: 20px; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            border: 1px solid transparent;
-            transition: 0.2s;
+        /* 单词卡片排列 */
+        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .card {
+            background: #1e293b; border-radius: 12px; padding: 20px;
+            cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
+            display: flex; flex-direction: column;
         }
-        .card:hover { border-color: var(--core-color); background: #2d3436; }
-        .card.selected { border-color: #2ecc71; box-shadow: 0 0 15px rgba(46, 213, 115, 0.3); }
+        .card:hover { border-color: var(--core-hex); transform: translateY(-5px); background: #334155; }
+        .card.active { border-color: var(--accent); background: #334155; box-shadow: 0 0 15px var(--accent); }
 
-        .word-title { font-size: 22px; color: var(--core-color); font-weight: bold; }
-        .pos { font-size: 12px; opacity: 0.6; margin-left: 8px; }
+        .word-text { font-size: 22px; font-weight: bold; color: var(--core-hex); }
+        .pos-tag { font-size: 11px; color: #94a3b8; margin-left: 8px; font-style: italic; }
+        .meaning { margin: 8px 0; font-size: 16px; font-weight: bold; }
+        .example-txt { font-size: 13px; color: #94a3b8; line-height: 1.4; flex-grow: 1; }
     </style>
 </head>
 <body>
 
-    <header style="text-align: center; margin-bottom: 40px;">
-        <h1>🎓 L2: EDUCATION LAB</h1>
-        <p>点击下方“实验样本(单词)”，观察核心词根的能量释放</p>
-    </header>
-
-    <div class="lab-monitor">
-        <div style="font-size: 12px; text-transform: uppercase; margin-bottom: 10px; opacity: 0.5;">Core Root Reactor</div>
-        <div id="active-root">WAITING...</div>
-        <div id="active-logic">请选择一个样本进行分析</div>
+    <div class="reactor-container">
+        <div style="font-size: 11px; letter-spacing: 3px; opacity: 0.5;">CORE LOGIC DECODER</div>
+        <div id="core-display">READY...</div>
+        <div id="logic-display">点击单词启动核心逻辑解码</div>
     </div>
 
     
 
-    <div class="vocab-grid" id="vocab-container"></div>
+    <div class="vocab-grid" id="container"></div>
 
     <script>
-        // 更新实验室显示
-        function updateLab(root, logic, element) {
-            // 1. 更新文字
-            document.getElementById('active-root').innerText = root;
-            document.getElementById('active-logic').innerText = "💡 " + logic;
-            
-            // 2. 视觉反馈：震动一下中心
-            const monitor = document.getElementById('active-root');
-            monitor.style.transform = "scale(1.2)";
-            setTimeout(() => monitor.style.transform = "scale(1)", 200);
+        const coreEl = document.getElementById('core-display');
+        const logicEl = document.getElementById('logic-display');
 
-            // 3. 高亮当前卡片
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-            element.classList.add('selected');
+        function activateWord(item, element) {
+            // 核心交互：更新上方监控器
+            coreEl.innerText = item.core;
+            logicEl.innerText = "⚛️ " + item.logic;
+            
+            // 缩放震动反馈
+            coreEl.style.transform = "scale(1.2)";
+            setTimeout(() => coreEl.style.transform = "scale(1)", 200);
+
+            // 卡片高亮切换
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+
+            // 语音播放
+            const utterance = new SpeechSynthesisUtterance(item.word);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
         }
 
-        // 加载数据
+        // 加载数据并生成页面
         fetch('data.json')
             .then(res => res.json())
             .then(data => {
-                const container = document.getElementById('vocab-container');
+                const container = document.getElementById('container');
                 data.forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'card';
-                    // 绑定点击事件：传入词根和逻辑
-                    card.onclick = () => {
-                        updateLab(item.core, item.logic, card);
-                        // 顺便自动朗读
-                        const msg = new SpeechSynthesisUtterance(item.word);
-                        msg.lang = 'en-US';
-                        window.speechSynthesis.speak(msg);
-                    };
-
+                    card.onclick = () => activateWord(item, card);
                     card.innerHTML = `
-                        <div class="word-title">${item.word}<span class="pos">${item.pos}</span></div>
-                        <div style="margin: 10px 0;">${item.chinese}</div>
-                        <div style="font-size: 13px; opacity: 0.7;">${item.example}</div>
+                        <div><span class="word-text">${item.word}</span><span class="pos-tag">${item.pos}</span></div>
+                        <div class="meaning">${item.chinese}</div>
+                        <div class="example-txt">${item.example}</div>
                     `;
                     container.appendChild(card);
                 });
+            })
+            .catch(err => {
+                logicEl.innerText = "❌ 数据加载失败，请检查 data.json 格式";
             });
     </script>
 </body>
