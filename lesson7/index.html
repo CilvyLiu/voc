@@ -112,60 +112,91 @@
     <div class="vocab-grid" id="container">
         </div>
 
-    <script>
-        const coreEl = document.getElementById('core-display');
-        const logicEl = document.getElementById('logic-text');
-        const hub = document.getElementById('hub');
-        const openBtn = document.getElementById('open-btn');
-        const container = document.getElementById('container');
+   <script>
+    const coreEl = document.getElementById('core-display');
+    const logicEl = document.getElementById('logic-text');
+    const hub = document.getElementById('hub');
+    const openBtn = document.getElementById('open-btn');
+    const container = document.getElementById('container');
 
-        function setPanel(show) {
-            if(show) { hub.classList.remove('collapsed'); openBtn.style.display = 'none'; }
-            else { hub.classList.add('collapsed'); openBtn.style.display = 'block'; }
-        }
+    function setPanel(show) {
+        if(show) { hub.classList.remove('collapsed'); openBtn.style.display = 'none'; }
+        else { hub.classList.add('collapsed'); openBtn.style.display = 'block'; }
+    }
 
-        function activate(item, el) {
-            if(hub.classList.contains('collapsed')) setPanel(true);
-            coreEl.innerText = item.core;
-            logicEl.innerText = ">> " + item.logic;
-            
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-
-            // 语音播放
-            window.speechSynthesis.cancel();
-            const speech = new SpeechSynthesisUtterance(item.word);
-            speech.lang = 'en-US';
-            speech.rate = 0.9;
-            window.speechSynthesis.speak(speech);
-        }
-
-        // 加载数据
-        fetch('data.json')
-            .then(res => res.json())
-            .then(data => {
-                container.innerHTML = "";
-                data.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => activate(item, card);
-                    card.innerHTML = `
-                        <div class="word-box">
-                            <div>
-                                <span class="word-txt">${item.word}</span>
-                                <span class="phonetic">${item.ipa}</span>
-                            </div>
-                            <span class="pos-txt">${item.pos}</span>
-                        </div>
-                        <div class="mean-txt">${item.chinese}</div>
-                        <div class="exam-txt">${item.example}</div>
-                    `;
-                    container.appendChild(card);
-                });
-            })
-            .catch(err => {
-                container.innerHTML = "<div style='color:red'>数据读取错误，请检查 data.json 格式</div>";
+    // 核心发音函数：确保安卓/苹果兼容的标准英音
+    function playUKEnglish(text) {
+        // 1. 优先使用云端真人英音 (Type 2 = RP Standard)
+        const audioUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`;
+        const audio = new Audio(audioUrl);
+        
+        // 针对 iOS 的 play() 兼容性处理
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                // 2. 如果云端音频加载失败（如断网），自动降级到系统 TTS
+                console.log("Switching to System TTS...");
+                window.speechSynthesis.cancel();
+                const speech = new SpeechSynthesisUtterance(text);
+                
+                // 强制寻找系统内的英国音包
+                const voices = window.speechSynthesis.getVoices();
+                const ukVoice = voices.find(v => v.lang.includes('en-GB') || v.name.includes('United Kingdom'));
+                
+                if (ukVoice) speech.voice = ukVoice;
+                speech.lang = 'en-GB'; 
+                speech.rate = 0.85;
+                window.speechSynthesis.speak(speech);
             });
-    </script>
+        }
+    }
+
+    function activate(item, el) {
+        if(hub.classList.contains('collapsed')) setPanel(true);
+        coreEl.innerText = item.core;
+        logicEl.innerText = ">> " + item.logic;
+        
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+
+        // 执行标准英音播放
+        playUKEnglish(item.word);
+    }
+
+    // 加载数据
+    fetch('data.json')
+        .then(res => res.json())
+        .then(data => {
+            container.innerHTML = "";
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => activate(item, card);
+                card.innerHTML = `
+                    <div class="word-box">
+                        <div>
+                            <span class="word-txt">${item.word}</span>
+                            <span class="phonetic">${item.ipa || ''}</span>
+                        </div>
+                        <span class="pos-txt">${item.pos}</span>
+                    </div>
+                    <div class="mean-txt">${item.chinese}</div>
+                    <div class="exam-txt">${item.example}</div>
+                `;
+                container.appendChild(card);
+            });
+        })
+        .catch(err => {
+            container.innerHTML = "<div style='color:var(--accent); padding:20px;'>❌ 数据采样失败，请检查实验室 data.json 链路。</div>";
+        });
+
+    // 针对 iOS 系统的特殊优化：预热音频上下文
+    document.addEventListener('touchstart', function() {
+        const dummy = new Audio();
+        dummy.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA== ";
+        dummy.play().catch(()=>{});
+    }, { once: true });
+</script>
 </body>
 </html>
