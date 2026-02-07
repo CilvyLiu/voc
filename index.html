@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova's Vocab Lab | 全息词汇门户</title>
+    <style>
+        :root {
+            --lab-bg: #f5f6fa;
+            --lab-dark: #2f3542;
+            --lab-accent: #2ed573;
+            --lab-inactive: #a4b0be;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--lab-bg);
+            color: var(--lab-dark);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            padding: 60px 0;
+            background: linear-gradient(135deg, var(--lab-dark), #57606f);
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .lab-title { font-size: 2.5em; margin: 0; letter-spacing: 2px; }
+        .lab-subtitle { opacity: 0.8; margin-top: 10px; font-weight: 300; }
+
+        .grid-container {
+            max-width: 1100px;
+            width: 90%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 50px 0;
+        }
+
+        .lesson-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-bottom: 4px solid var(--lab-inactive);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-12px);
+            border-bottom-color: var(--lab-accent);
+            box-shadow: 0 15px 30px rgba(46, 213, 115, 0.2);
+        }
+
+        .lesson-num {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--lab-accent);
+            font-weight: bold;
+        }
+
+        .lesson-name {
+            font-size: 1.5em;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lesson-logic {
+            font-size: 0.9em;
+            color: #747d8c;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .status-pill {
+            margin-top: 20px;
+            align-self: flex-start;
+            padding: 4px 12px;
+            background: #f1f2f6;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--lab-inactive);
+        }
+
+        .active-pill {
+            background: rgba(46, 213, 115, 0.1);
+            color: var(--lab-accent);
+        }
+
+        footer { margin: 40px 0; color: var(--lab-inactive); font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="lab-title">🧪 Nova's Vocab Lab</h1>
+        <p class="lab-subtitle">Core-to-Edge: 词汇母语感建模实验</p>
+    </header>
+
+    <div class="grid-container">
+        <a href="./lesson1/index.html" class="lesson-card">
+            <span class="lesson-num">Lesson 01</span>
+            <div class="lesson-name">✈️ Survival</div>
+            <p class="lesson-logic">核心逻辑：<b>空间的矢量移动</b>。掌握位移、港口与准入系统，建立跨国生存的基础动能。</p>
+            <span class="status-pill active-pill">已部署 (47 词)</span>
+        </a>
+
+        <a href="./lesson2/index.html" class="lesson-card">
+            <span class="lesson-num">Lesson 02</span>
+            <div class="lesson-name">🎓 Education</div>
+            <p class="lesson-logic">核心逻辑：<b>内化的结构生长</b>。从词根 -struct- (建造) 到 -duc- (引导)，看思维如何被塑造。</p>
+            <span class="status-pill">待上传数据</span>
+        </a>
+
+        <a href="./lesson3/index.html" class="lesson-card">
+            <span class="lesson-num">Lesson 03</span>
+            <div class="lesson-name">🌳 Nature</div>
+            <p class="lesson-logic">核心逻辑：<b>生命的本原状态</b>。探索 -nat- (出生) 与 -bio- (生命) 的自然演化路径。</p>
+            <span class="status-pill">待上传数据</span>
+        </a>
+
+        <a href="./lesson4/index.html" class="lesson-card">
+            <span class="lesson-num">Lesson 04</span>
+            <div class="lesson-name">🌍 Environment</div>
+            <p class="lesson-logic">核心逻辑：<b>闭环系统与包围</b>。理解 -viron- (环绕) 与空间的可持续反应。</p>
+            <span class="status-pill">待上传数据</span>
+        </a>
+
+        <a href="./lesson5/index.html" class="lesson-card">
+            <span class="lesson-num">Lesson 05</span>
+            <div class="lesson-name">💻 Technology</div>
+            <p class="lesson-logic">核心逻辑：<b>工具的编织与规律</b>。拆解 -tech- (编织工艺) 与 -log- (言语/逻辑) 的交织。</p>
+            <span class="status-pill">待上传数据</span>
+        </a>
+
+        <a href="./lesson6/index.html" class="lesson-card">
+            <span class="lesson-num">Lesson 06</span>
+            <div class="lesson-name">🏛️ Culture</div>
+            <p class="lesson-logic">核心逻辑：<b>时间的耕耘与继承</b>。深挖 -cult- (耕种) 与 -her- (继承) 的文明厚度。</p>
+            <span class="status-pill">待上传数据</span>
+        </a>
+
+        <a href="./lesson7/index.html" class="lesson-card">
+            <span class="lesson-num">Lesson 07</span>
+            <div class="lesson-name">💊 Medicine</div>
+            <p class="lesson-logic">核心逻辑：<b>生命的介入与中间值</b>。探究 -med- (中间/治疗) 对健康状态的调节。</p>
+            <span class="status-pill">待上传数据</span>
+        </a>
+    </div>
+
+    <footer>
+        Designed by Nova | 2026 全息教学实验室
+    </footer>
+
+</body>
+</html>
