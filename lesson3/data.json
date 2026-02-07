@@ -19,7 +19,7 @@
   { "word": "flood", "pos": "n./v.", "chinese": "洪水", "example": "The river flooded the nearby villages.", "core": "FLOW", "logic": "溢出的流动水体" },
   { "word": "tsunami", "pos": "n.", "chinese": "海啸", "example": "A tsunami struck after the undersea earthquake.", "core": "TSU", "logic": "日语 - 津 (港口) + 波 (浪)" },
   { "word": "volcanic eruption", "pos": "n.", "chinese": "火山喷发", "example": "The volcanic eruption sent ash miles into the sky.", "core": "ERUPT", "logic": "E (出) + RUPT (断/破) - 核心喷涌而出" },
-  { "word": "earth", "n.", "chinese": "地球；土壤", "example": "The Earth is the third planet from the Sun.", "core": "EARTH", "logic": "大地、泥土、人类居所" },
+  { "word": "earth", "pos": "n.", "chinese": "地球；土壤", "example": "The Earth is the third planet from the Sun.", "core": "EARTH", "logic": "大地、泥土、人类居所" },
   { "word": "globe", "pos": "n.", "chinese": "地球；球体", "example": "She pointed to France on the globe.", "core": "GLOBE", "logic": "圆球状的物体" },
   { "word": "sphere", "pos": "n.", "chinese": "球体；领域", "example": "The Earth is almost a perfect sphere.", "core": "SPHERE", "logic": "SPHAIRA (Ball) - 球体及覆盖范围" },
   { "word": "planet", "pos": "n.", "chinese": "行星", "example": "Mars is the fourth planet in our solar system.", "core": "PLANE", "logic": "漫游者 - 在星空中穿梭的星体" },
