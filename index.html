@@ -8,6 +8,7 @@
         :root {
             --neon-green: #2ed573;
             --neon-blue: #70a1ff;
+            --neon-purple: #a29bfe;
             --neon-red: #ff4757;
             --cyber-dark: #0a0b0d;
             --glass-white: rgba(255, 255, 255, 0.05);
@@ -17,214 +18,151 @@
         body {
             background-color: var(--cyber-dark);
             background-image: 
-                radial-gradient(circle at 20% 30%, rgba(46, 213, 115, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(112, 161, 255, 0.05) 0%, transparent 40%);
+                radial-gradient(circle at 10% 20%, rgba(112, 161, 255, 0.05) 0%, transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(162, 155, 254, 0.05) 0%, transparent 30%);
             color: #e1e1e1;
             font-family: 'Space Grotesk', 'PingFang SC', -apple-system, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
-        /* 极客感头部 */
-        header {
-            width: 100%;
-            padding: 100px 0 60px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::before {
-            content: "SYSTEM_RECONSTRUCT_INITIATED";
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: monospace;
-            font-size: 10px;
-            color: var(--neon-green);
-            letter-spacing: 5px;
-            opacity: 0.5;
-        }
-
+        header { width: 100%; padding: 80px 0 40px; text-align: center; position: relative; }
+        
         .lab-title { 
-            font-size: 3.5em; 
-            margin: 0; 
-            font-weight: 800;
-            background: linear-gradient(to bottom, #fff 30%, #666 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
+            font-size: 3.2em; margin: 0; font-weight: 800;
+            background: linear-gradient(to bottom, #fff 40%, #666 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
         }
 
         .lab-subtitle { 
-            color: var(--neon-green);
-            margin-top: 15px; 
-            font-size: 0.9em;
-            letter-spacing: 4px;
-            font-family: monospace;
+            color: var(--neon-green); margin-top: 15px; font-size: 0.85em;
+            letter-spacing: 5px; font-family: monospace;
         }
 
-        /* 磁贴网格 */
         .grid-container {
-            max-width: 1200px;
-            width: 90%;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-            padding-bottom: 80px;
+            max-width: 1200px; width: 90%;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px; padding-bottom: 60px;
         }
 
-        /* 玻璃化卡片 */
+        /* 核心卡片样式 */
         .lesson-card {
             background: var(--glass-white);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border);
-            border-radius: 4px; /* 摒弃圆润，ENTP喜欢利落的边缘 */
-            padding: 35px;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
+            border-radius: 4px; padding: 30px;
+            text-decoration: none; color: inherit;
+            display: flex; flex-direction: column;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .lesson-card::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--card-color, var(--neon-green)), transparent);
-            transform: translateX(-100%);
-            transition: 0.6s;
+            position: relative; overflow: hidden;
         }
 
         .lesson-card:hover {
-            transform: translateY(-5px) scale(1.02);
+            transform: translateY(-5px);
             background: rgba(255, 255, 255, 0.08);
             border-color: var(--card-color, var(--neon-green));
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
         }
 
-        .lesson-card:hover::after {
-            transform: translateX(100%);
-        }
-
-        .lesson-num {
-            font-family: monospace;
-            font-size: 0.8em;
-            color: var(--card-color, var(--neon-green));
-            opacity: 0.7;
-        }
-
-        .lesson-name {
-            font-size: 1.8em;
-            margin: 15px 0;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .lesson-logic {
-            font-size: 0.9em;
-            color: #999;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-
-        /* 状态指示器 */
+        .lesson-num { font-family: monospace; font-size: 0.75em; color: var(--card-color, var(--neon-green)); opacity: 0.8; }
+        .lesson-name { font-size: 1.6em; margin: 12px 0; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .lesson-logic { font-size: 0.85em; color: #999; line-height: 1.6; margin-bottom: 20px; flex-grow: 1; }
+        
         .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            color: var(--card-color, var(--neon-green));
-            text-transform: uppercase;
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 10px; font-weight: bold; color: var(--card-color, var(--neon-green));
         }
+        .status-pill::before { content: ""; width: 4px; height: 4px; background: var(--card-color, var(--neon-green)); border-radius: 50%; }
 
-        .status-pill::before {
-            content: "";
-            width: 6px; height: 6px;
-            background: var(--card-color, var(--neon-green));
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--card-color, var(--neon-green));
-            animation: pulse 2s infinite;
-        }
-
-        /* 测验中心特殊样式 */
-        .quiz-card {
-            grid-column: span 1;
-            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), transparent);
-            border-color: rgba(255, 71, 87, 0.3);
-            --card-color: var(--neon-red);
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
-
-        footer { 
-            padding: 40px; 
-            font-family: monospace;
-            font-size: 0.8em; 
-            opacity: 0.4;
-        }
-
-        /* 个性化配色 */
+        /* 特殊区域样式 */
         .u1 { --card-color: #70a1ff; }
         .u2 { --card-color: #7bed9f; }
         .u3 { --card-color: #eccc68; }
         .u4 { --card-color: #ff7f50; }
-        .u5 { --card-color: #a29bfe; }
+        .u5 { --card-color: #5352ed; }
+        .u6 { --card-color: #ffa502; }
+        .u7 { --card-color: var(--neon-purple); }
+        
+        .exp-card { --card-color: var(--neon-blue); background: linear-gradient(135deg, rgba(112, 161, 255, 0.05), transparent); }
+        .quiz-card { --card-color: var(--neon-red); background: linear-gradient(135deg, rgba(255, 71, 87, 0.05), transparent); }
+
+        footer { padding: 40px; font-family: monospace; font-size: 0.7em; opacity: 0.3; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
     <header>
         <h1 class="lab-title">Nova's Lab</h1>
-        <p class="lab-subtitle">// NEURAL_NET_VOCAB_SYNC_2026</p>
+        <p class="lab-subtitle">// SYSTEM_CORE: 7_LESSONS_READY</p>
     </header>
 
     <div class="grid-container">
         <a href="./lesson1/index.html" class="lesson-card u1">
-            <span class="lesson-num">01 / SURVIVAL_VECTORS</span>
-            <div class="lesson-name">✈️ 空间生存 <small style="font-size: 0.5em; opacity: 0.5;">[v1.0]</small></div>
-            <p class="lesson-logic"><b>矢量位移逻辑</b>。不仅仅是旅行，是掌握物理空间与系统准入的底层动能。</p>
-            <span class="status-pill">DEPLOYED_47_UNITS</span>
+            <span class="lesson-num">01 / SURVIVAL</span>
+            <div class="lesson-name">✈️ 空间生存</div>
+            <p class="lesson-logic">矢量位移逻辑。掌握物理空间位移与系统准入，建立跨国生存的底层动能。</p>
+            <span class="status-pill">DEPLOYED_47_WORDS</span>
         </a>
 
         <a href="./lesson2/index.html" class="lesson-card u2">
-            <span class="lesson-num">02 / STRUCTURAL_GROWTH</span>
+            <span class="lesson-num">02 / EDUCATION</span>
             <div class="lesson-name">🎓 结构演化</div>
-            <p class="lesson-logic"><b>内化建模逻辑</b>。拆解思维建造过程，看知识如何从词根生长为逻辑大厦。</p>
-            <span class="status-pill">DEPLOYED_70_UNITS</span>
+            <p class="lesson-logic">内化建模逻辑。拆解思维建造过程，看知识如何从词根生长为逻辑大厦。</p>
+            <span class="status-pill">DEPLOYED_70_WORDS</span>
         </a>
 
         <a href="./lesson3/index.html" class="lesson-card u3">
-            <span class="lesson-num">03 / BIO_ORIGIN</span>
+            <span class="lesson-num">03 / NATURE</span>
             <div class="lesson-name">🌳 生命本原</div>
-            <p class="lesson-logic"><b>自然演化逻辑</b>。回溯生命的原始代码，探索从原子到生物形态的语言映射。</p>
-            <span class="status-pill">DEPLOYED_42_UNITS</span>
+            <p class="lesson-logic">自然演化逻辑。回溯生命原始代码，探索从原子到生物形态的语言映射。</p>
+            <span class="status-pill">DEPLOYED_42_WORDS</span>
+        </a>
+
+        <a href="./lesson4/index.html" class="lesson-card u4">
+            <span class="lesson-num">04 / ENVIRONMENT</span>
+            <div class="lesson-name">🌍 闭环系统</div>
+            <p class="lesson-logic">空间环绕逻辑。理解可持续反应系统，掌握宏观环境与个体的交互反馈。</p>
+            <span class="status-pill">DEPLOYED_42_WORDS</span>
+        </a>
+
+        <a href="./lesson5/index.html" class="lesson-card u5">
+            <span class="lesson-num">05 / TECHNOLOGY</span>
+            <div class="lesson-name">💻 工具逻辑</div>
+            <p class="lesson-logic">编织与规律逻辑。拆解工艺与言语的交织，理解技术如何重塑现实边界。</p>
+            <span class="status-pill">DEPLOYED_45_WORDS</span>
+        </a>
+
+        <a href="./lesson6/index.html" class="lesson-card u6">
+            <span class="lesson-num">06 / CULTURE</span>
+            <div class="lesson-name">🏛️ 文明厚度</div>
+            <p class="lesson-logic">耕耘与继承逻辑。深挖时间长河中的文明留存，掌握文化母语感的精神内核。</p>
+            <span class="status-pill">DEPLOYED_54_WORDS</span>
+        </a>
+
+        <a href="./lesson7/index.html" class="lesson-card u7">
+            <span class="lesson-num">07 / MEDICINE</span>
+            <div class="lesson-name">💊 生命干预</div>
+            <p class="lesson-logic">中间调节逻辑。探索外部手段如何介入生命流，调节生物个体的健康阈值。</p>
+            <span class="status-pill">DEPLOYED_43_WORDS</span>
+        </a>
+
+        <a href="expressions.html" class="lesson-card exp-card">
+            <span class="lesson-num">CORE_OUTPUT</span>
+            <div class="lesson-name">🗣️ 表达中心</div>
+            <p class="lesson-logic">高频场景模型。全单元常用表达全量部署，实现从词汇建模到口语输出的跃迁。</p>
+            <span class="status-pill">7_UNITS_INTEGRATED</span>
         </a>
 
         <a href="quiz.html" class="lesson-card quiz-card">
-            <span class="lesson-num">MASTER_PROBE</span>
-            <div class="lesson-name">🚀 全量测评</div>
-            <p class="lesson-logic"><b>综合测试</b>。全量 343 词汇随机调取，检测对词汇逻辑的瞬时反应力。</p>
-            <div class="status-pill">READY_TO_TEST</div>
+            <span class="lesson-num">NEURAL_PROBE</span>
+            <div class="lesson-name">🚀 综合测评</div>
+            <p class="lesson-logic">压力环境测试。7 大领域随机数据调取，检测神经突触对全量词汇的瞬时反应力。</p>
+            <span class="status-pill">READY_TO_TEST</span>
         </a>
     </div>
 
     <footer>
-        &copy; 2026 NOVA_NEURO_LABS | ENTP_PERSONAL_ENVIRONMENT
+        &copy; 2026 NOVA_NEURO_LABS | ENVIROMENT_INIT
     </footer>
 
 </body>
