@@ -17,11 +17,11 @@
         
         header { text-align: center; margin: 20px 0; }
 
-        /* --- 核心视觉组件：反应堆面板 --- */
+        /* --- 核心视觉组件：原子逻辑展示区 --- */
         .visual-lab-hub {
             max-width: 800px;
             margin: 0 auto 40px;
-            background: radial-gradient(circle, rgba(255,71,87,0.15) 0%, rgba(15,23,42,1) 80%);
+            background: radial-gradient(circle, rgba(255,71,87,0.1) 0%, rgba(15,23,42,1) 70%);
             padding: 40px;
             border-radius: 20px;
             text-align: center;
@@ -31,61 +31,59 @@
 
         .core-visual {
             position: relative;
-            width: 130px;
-            height: 130px;
+            width: 120px;
+            height: 120px;
             background: var(--core);
             border-radius: 50%;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
-            font-weight: 900;
-            box-shadow: 0 0 40px var(--core);
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 0 30px var(--core);
             z-index: 2;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            color: white;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* 轨道动画 */
         .orbit {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 260px; height: 260px;
-            border: 2px solid rgba(30, 144, 255, 0.2);
+            width: 240px; height: 240px;
+            border: 1px solid rgba(30, 144, 255, 0.3);
             border-radius: 50%;
-            animation: rotate 15s linear infinite;
+            animation: rotate 10s linear infinite;
         }
 
         @keyframes rotate { from {transform: translate(-50%, -50%) rotate(0deg);} to {transform: translate(-50%, -50%) rotate(360deg);} }
 
-        /* --- 列表布局 --- */
-        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        /* --- 单词列表布局 --- */
+        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
         
         .card { 
             background: var(--card-bg); 
             color: #2f3542;
             border-radius: 16px; 
             padding: 24px; 
-            cursor: pointer;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
             border-top: 5px solid var(--core); 
             transition: 0.3s;
+            cursor: pointer;
         }
 
-        .card:hover { transform: translateY(-5px); border-top-color: var(--edge); }
-        .card.active { border: 2px solid var(--edge); box-shadow: 0 0 20px rgba(30, 144, 255, 0.4); }
+        .card:hover { transform: translateY(-5px); }
+        .card.active { border: 2px solid var(--edge); transform: scale(1.02); }
 
         .word-row { display: flex; justify-content: space-between; align-items: center; }
-        .word { font-size: 26px; font-weight: 800; color: var(--core); }
+        .word { font-size: 26px; font-weight: 800; color: var(--core); letter-spacing: -0.5px; }
         
         .btn-audio { cursor: pointer; border: none; background: #f0f2f5; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; }
 
         .logic-box { 
             margin-top: 15px;
             padding: 12px;
-            background: rgba(30, 144, 255, 0.08);
+            background: rgba(30, 144, 255, 0.05);
             border-radius: 8px;
             font-size: 13.5px;
             border-left: 3px solid var(--edge);
@@ -99,22 +97,24 @@
     
     <header>
         <h1>✈️ L1: SURVIVAL ANALYTICS</h1>
-        <p>点击单词卡片，观测核心词根的能量裂变</p>
+        <p>正在观察词汇在空间位移中的能量坍缩与重构</p>
     </header>
 
     <div class="visual-lab-hub">
-        <div style="position: relative; height: 300px; display: flex; align-items: center; justify-content: center;">
+        <div style="position: relative; height: 260px; display: flex; align-items: center; justify-content: center;">
             <div class="orbit"></div>
-            <div class="core-visual" id="active-root">ROOT</div>
-            <div id="logic-bubble" style="position: absolute; bottom: 0; color: #2ecc71; font-weight: bold; font-size: 14px;">[ 待命中：请选择实验样本 ]</div>
+            <div class="core-visual" id="active-core">ROOT</div>
+            <div id="logic-info" style="position: absolute; color: var(--edge); top: 10%; font-weight: bold;">[ READY ]</div>
         </div>
+        <p id="logic-detail" style="font-style: italic; opacity: 0.7; color: #2ecc71;">点击下方卡片启动核心解码</p>
     </div>
 
     <div class="vocab-grid" id="vocab-container"></div>
 
     <script>
-        const rootDisplay = document.getElementById('active-root');
-        const logicDisplay = document.getElementById('logic-bubble');
+        const coreEl = document.getElementById('active-core');
+        const infoEl = document.getElementById('logic-info');
+        const detailEl = document.getElementById('logic-detail');
 
         function speak(text) {
             const msg = new SpeechSynthesisUtterance(text);
@@ -123,21 +123,18 @@
             window.speechSynthesis.speak(msg);
         }
 
-        // 核心交互函数
+        // 修改点：定义点击分析逻辑
         function analyze(item, element) {
-            // 1. 更新顶部视觉文字
-            rootDisplay.innerText = item.core;
-            logicDisplay.innerText = "💡 Logic: " + item.logic;
+            coreEl.innerText = item.core;
+            infoEl.innerText = "[ DECODED ]";
+            detailEl.innerText = "⚛️ " + item.logic;
             
-            // 2. 触发动画反馈
-            rootDisplay.style.transform = "scale(1.2) rotate(5deg)";
-            setTimeout(() => { rootDisplay.style.transform = "scale(1) rotate(0deg)"; }, 200);
+            // 动效反馈
+            coreEl.style.transform = "scale(1.2)";
+            setTimeout(() => coreEl.style.transform = "scale(1)", 200);
 
-            // 3. 高亮选中的卡片
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
-
-            // 4. 朗读
             speak(item.word);
         }
 
@@ -146,9 +143,9 @@
             .then(data => {
                 const container = document.getElementById('vocab-container');
                 data.forEach(item => {
+                    // 修改点：使用 createElement 确保能绑定 onclick 事件
                     const card = document.createElement('div');
                     card.className = 'card';
-                    // 绑定点击事件
                     card.onclick = () => analyze(item, card);
                     
                     card.innerHTML = `
@@ -164,7 +161,7 @@
                             ${item.example}
                         </div>
                         <div class="logic-box">
-                            <div class="core-tag">⚛️ Core: ${item.core}</div>
+                            <div class="core-tag">⚛️ Core Logic: ${item.core}</div>
                         </div>
                     `;
                     container.appendChild(card);
